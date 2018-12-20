@@ -1,7 +1,11 @@
-const swagger = require('../dist');
+const { Swagger } = require('../dist');
 
-class MyAPI extends swagger.Swagger {
+class MyAPI extends Swagger {
   constructor () {
+    super();
   }
 }
 
+const api = new MyAPI();
+
+api.run();
