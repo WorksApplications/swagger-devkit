@@ -1,4 +1,30 @@
 openapi: 3.0.0
+paths:
+  /pets:
+    get:
+      summary: List all pets
+      operationId: listPets
+      tags:
+        - pets
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: A paged array of pets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                _ref: '#/components/schemas/Pets'
+          content:
+            application/json:
+              _ref: '#/components/schemas/Error'
 info:
   title: Swagger Petstore
   version: 1.0.0
