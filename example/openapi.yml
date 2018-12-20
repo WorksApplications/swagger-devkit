@@ -24,13 +24,15 @@ paths:
                 $ref: '#/components/schemas/Pets'
           content:
             application/json:
-              $ref: '#/components/schemas/Error'
+              props:
+                $ref: '#/components/schemas/Error'
         default:
           description: unexpected error
           headers: {}
           content:
             application/json:
-              $ref: '#/components/schemas/Error'
+              props:
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a pet
       operationId: createPets
@@ -47,7 +49,8 @@ paths:
           headers: {}
           content:
             application/json:
-              $ref: '#/components/schemas/Error'
+              props:
+                $ref: '#/components/schemas/Error'
   '/pets/{petId}':
     get:
       summary: Info for a specific pet
@@ -67,15 +70,28 @@ paths:
           headers: {}
           content:
             application/json:
-              $ref: '#/components/schemas/Pets'
+              props:
+                $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           headers: {}
           content:
             application/json:
-              $ref: '#/components/schemas/Error'
+              props:
+                $ref: '#/components/schemas/Error'
 info:
   title: Swagger Petstore
   version: 1.0.0
 servers:
   - url: 'http://petstore.swagger.io/v1'
+components:
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

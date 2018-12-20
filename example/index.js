@@ -15,6 +15,22 @@ api.addServers([
 
 const pets = '/pets';
 
+const err = new swagger.Component(api, 'Error', {
+  required: [
+    'code',
+    'message',
+  ],
+  properties: {
+    'code': {
+      type: 'integer',
+      format: 'int32',
+    },
+    'message': {
+      type: 'string'
+    }
+  }
+});
+
 api.addPath(
   pets,
   swagger.HttpMethod.GET,
@@ -46,18 +62,14 @@ api.addPath(
         "$ref": '#/components/schemas/Pets',
       }
     })
-    .addContent('application/json', {
-      "$ref": '#/components/schemas/Error',
-    })
+    .addContent('application/json', err)
   )
   .addResponse(
     'default',
     new swagger.Response({
       description: 'unexpected error',
     })
-    .addContent('application/json', {
-      "$ref": '#/components/schemas/Error',
-    })
+    .addContent('application/json', err)
   )
 );
 
@@ -80,9 +92,7 @@ api.addPath(
     new swagger.Response({
       description: 'unexpected error',
     })
-    .addContent('application/json', {
-      "$ref": '#/components/schemas/Error',
-    })
+    .addContent('application/json', err)
   )
 )
 
@@ -117,9 +127,7 @@ api.addPath(
     new swagger.Response({
       description: 'unexpected error',
     })
-    .addContent('application/json', {
-      "$ref": '#/components/schemas/Error',
-    })
+    .addContent('application/json', err)
   )
 );
 

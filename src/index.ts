@@ -20,25 +20,46 @@ export enum HttpMethod {
   OPTIONS = <any>"options",
 }
 
-type SchemaProps = {
+export class Ref {
+  ref: string;
+
+  constructor (ref: string) {
+    this.ref = ref;
+  }
+}
+
+export interface SchemaProps {
   type: string,
-  items: SchemaProps,
-} | {
-  type: string,
-  properties: Map<string, SchemaProps>,
-} | {
-  "$ref": string,
-} | {
-  type: string,
+  required?: Array<string>,
+  properties?: {
+    [key: string]: SchemaProps | Schema,
+  },
+  items?: SchemaProps | Schema,
   format?: string,
-};
+}
+
+export class Schema {
+  props: object;
+
+  constructor (props: Ref | SchemaProps) {
+    if (props instanceof Ref) {
+      this.props = { "$ref": props.ref };
+    } else {
+      this.props = props;
+    }
+  }
+
+  render (): object {
+    return this.props;
+  }
+}
 
 export interface ParameterProps {
   name: string,
   in: string,
   description: string,
   required: boolean,
-  schema: SchemaProps,
+  schema: Schema,
 }
 
 export interface PathProps {
@@ -49,7 +70,7 @@ export interface PathProps {
 
 export interface HeaderProps {
   description: string,
-  schema: SchemaProps,
+  schema: Schema,
 }
 
 export interface ResponseProps {
@@ -68,7 +89,7 @@ function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) 
 export class Response {
   props: ResponseProps;
   headers: Map<string, HeaderProps> = new Map();
-  content: Map<string, SchemaProps> = new Map();
+  content: Map<string, Schema> = new Map();
 
   constructor (props: ResponseProps) {
     this.props = props;
@@ -79,8 +100,8 @@ export class Response {
     return this;
   }
 
-  addContent (contentType: string, schema: SchemaProps): Response {
-    this.content.set(contentType, schema);
+  addContent (contentType: string, schema: Ref | SchemaProps): Response {
+    this.content.set(contentType, new Schema(schema));
     return this;
   }
 
@@ -125,10 +146,26 @@ export class Path {
   }
 }
 
+export class Component extends Ref {
+  schema: Schema;
+
+  constructor (parent: Swagger, name: string, schema: Ref | SchemaProps) {
+    super(`#/components/schemas/${name}`);
+
+    parent.components.set(name, this);
+    this.schema = new Schema(schema);
+  }
+
+  render (): object {
+    return this.schema.render();
+  }
+}
+
 export class Swagger {
   outfile: string = 'openapi.yml';
   object: any = {};
   paths: Map<string, Map<HttpMethod, Path>> = new Map();
+  components: Map<string, Component> = new Map();
 
   constructor (openapi: string = '3.0.0') {
     this.addObject('openapi', openapi);
@@ -166,6 +203,12 @@ export class Swagger {
     });
     this.object['paths'] = pathObject;
 
-    fs.writeFileSync(this.outfile, yaml.dump(this.object));
+    fs.writeFileSync(this.outfile, yaml.dump(Object.assign(
+      this.object,
+      {
+        paths: pathObject,
+        components: mapToObj(this.components, r => r.render()),
+      }
+    )));
   }
 }
