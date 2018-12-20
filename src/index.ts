@@ -27,7 +27,7 @@ type SchemaProps = {
   type: string,
   properties: Map<string, SchemaProps>,
 } | {
-  _ref: string,
+  "$ref": string,
 } | {
   type: string,
   format?: string,

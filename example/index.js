@@ -13,8 +13,10 @@ api.addServers([
   }
 ]);
 
+const pets = '/pets';
+
 api.addPath(
-  '/pets',
+  pets,
   swagger.HttpMethod.GET,
   new swagger.Path({
     summary: 'List all pets',
@@ -41,11 +43,82 @@ api.addPath(
     .addHeader('x-next', {
       description: 'A link to the next page of responses',
       schema: {
-        _ref: '#/components/schemas/Pets',
+        "$ref": '#/components/schemas/Pets',
       }
     })
     .addContent('application/json', {
-      _ref: '#/components/schemas/Error',
+      "$ref": '#/components/schemas/Error',
+    })
+  )
+  .addResponse(
+    'default',
+    new swagger.Response({
+      description: 'unexpected error',
+    })
+    .addContent('application/json', {
+      "$ref": '#/components/schemas/Error',
+    })
+  )
+);
+
+api.addPath(
+  pets,
+  swagger.HttpMethod.POST,
+  new swagger.Path({
+    summary: 'Create a pet',
+    operationId: 'createPets',
+    tags: [ 'pets' ],
+  })
+  .addResponse(
+    '201',
+    new swagger.Response({
+      description: 'Null response'
+    })
+  )
+  .addResponse(
+    'default',
+    new swagger.Response({
+      description: 'unexpected error',
+    })
+    .addContent('application/json', {
+      "$ref": '#/components/schemas/Error',
+    })
+  )
+)
+
+api.addPath(
+  `${pets}/{petId}`,
+  swagger.HttpMethod.GET,
+  new swagger.Path({
+    summary: 'Info for a specific pet',
+    operationId: 'showPetById',
+    tags: [ 'pets' ],
+  })
+  .addParameter({
+    name: 'petId',
+    in: 'path',
+    required: true,
+    description: 'The id of the pet to retrieve',
+    schema: {
+      type: 'string',
+    }
+  })
+  .addResponse(
+    '200',
+    new swagger.Response({
+      description: 'Expected response to a valid request',
+    })
+    .addContent('application/json', {
+      "$ref": '#/components/schemas/Pets',
+    })
+  )
+  .addResponse(
+    'default',
+    new swagger.Response({
+      description: 'unexpected error',
+    })
+    .addContent('application/json', {
+      "$ref": '#/components/schemas/Error',
     })
   )
 );

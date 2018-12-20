@@ -21,10 +21,59 @@ paths:
             x-next:
               description: A link to the next page of responses
               schema:
-                _ref: '#/components/schemas/Pets'
+                $ref: '#/components/schemas/Pets'
           content:
             application/json:
-              _ref: '#/components/schemas/Error'
+              $ref: '#/components/schemas/Error'
+        default:
+          description: unexpected error
+          headers: {}
+          content:
+            application/json:
+              $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a pet
+      operationId: createPets
+      tags:
+        - pets
+      parameters: []
+      responses:
+        '201':
+          description: Null response
+          headers: {}
+          content: {}
+        default:
+          description: unexpected error
+          headers: {}
+          content:
+            application/json:
+              $ref: '#/components/schemas/Error'
+  '/pets/{petId}':
+    get:
+      summary: Info for a specific pet
+      operationId: showPetById
+      tags:
+        - pets
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: The id of the pet to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          headers: {}
+          content:
+            application/json:
+              $ref: '#/components/schemas/Pets'
+        default:
+          description: unexpected error
+          headers: {}
+          content:
+            application/json:
+              $ref: '#/components/schemas/Error'
 info:
   title: Swagger Petstore
   version: 1.0.0
