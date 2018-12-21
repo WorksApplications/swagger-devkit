@@ -67,14 +67,15 @@ export class Schema {
     if (this.is_ref) {
       return this.props;
     } else {
-      return Object.assign(
-        this.props,
-        {
-          // Hmmm....
-          // So how to write properties transformation?
-          items: (this.props as SchemaProps).items ? new Schema((this.props as SchemaProps).items).render() : null,
-        }
-      );
+      let object = this.props as SchemaProps;
+
+      if (object.items) {
+        object = Object.assign(object, { items: new Schema(object.items).render() });
+      }
+
+      // Hmm, how to write properties transformation?
+
+      return object;
     }
   }
 }
@@ -224,7 +225,9 @@ export class Swagger {
       this.object,
       {
         paths: pathObject,
-        components: mapToObj(this.components, r => r.render()),
+        components: {
+          schemas: mapToObj(this.components, r => r.render())
+        },
       }
     )));
   }
