@@ -12,8 +12,15 @@ function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) 
 
 export type SchemaInput = SchemaProps | Ref;
 
+export enum SchemaType {
+  INTEGER = <any>"integer",
+  STRING = <any>"string",
+  OBJECT = <any>"object",
+  ARRAY = <any>"array",
+}
+
 export interface SchemaProps {
-  type: string,
+  type: SchemaType | string,
   required?: Array<string>,
   properties?: {
     [key: string]: SchemaInput,
