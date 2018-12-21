@@ -165,8 +165,17 @@ export class Path {
     } else {
       this.responses.set(statusCode, new Response(object));
     }
-    
+
     return this;
+  }
+
+  addResponses (responses: Array<{ statusCode: string, response: Response | ResponseProps }>): Path {
+    return responses.reduce(
+      (that, value) => {
+        return that.addResponse(value.statusCode, value.response);
+      },
+      this,
+    )
   }
 
   addRequestBody (requestBody: RequestBody): Path {
