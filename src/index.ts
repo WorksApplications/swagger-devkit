@@ -14,9 +14,23 @@ export type SchemaInput = SchemaProps | Ref;
 
 export enum SchemaType {
   INTEGER = <any>"integer",
+  NUMBER = <any>"number",
   STRING = <any>"string",
+  BOOLEAN = <any>"boolean",
   OBJECT = <any>"object",
   ARRAY = <any>"array",
+}
+
+export enum SchemaFormat {
+  INT32 = <any>"int32",
+  INT64 = <any>"int64",
+  FLOAT = <any>"float",
+  DOUBLE = <any>"double",
+  BYTE = <any>"byte",
+  BINARY = <any>"binary",
+  DATE = <any>"date",
+  DATETIME = <any>"datetime",
+  PASSWORD = <any>"password",
 }
 
 export interface SchemaProps {
@@ -26,13 +40,11 @@ export interface SchemaProps {
     [key: string]: SchemaInput,
   },
   items?: SchemaInput,
-  format?: string,
+  format?: SchemaFormat | string,
   example?: string,
   enum?: Array<string>,
   description?: string,
 }
-
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export class Schema {
   props: { "$ref": string } | SchemaProps;
@@ -46,6 +58,84 @@ export class Schema {
       this.props = props;
       this.is_ref = false;
     }
+  }
+
+  static int32 (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.INTEGER,
+      format: SchemaFormat.INT32,
+      ...overrideProps,
+    };
+  }
+
+  static int64 (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.INTEGER,
+      format: SchemaFormat.INT64,
+      ...overrideProps,
+    };
+  }
+
+  static float (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.NUMBER,
+      format: SchemaFormat.FLOAT,
+      ...overrideProps,
+    };
+  }
+
+  static double (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.NUMBER,
+      format: SchemaFormat.DOUBLE,
+      ...overrideProps,
+    };
+  }
+
+  static string (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.STRING,
+      ...overrideProps,
+    };
+  }
+
+  static byte (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.STRING,
+      format: SchemaFormat.BINARY,
+      ...overrideProps,
+    };
+  }
+
+  static boolean (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.BOOLEAN,
+      ...overrideProps,
+    };
+  }
+
+  static date (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.STRING,
+      format: SchemaFormat.DATE,
+      ...overrideProps,
+    };
+  }
+
+  static datetime (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.STRING,
+      format: SchemaFormat.DATETIME,
+      ...overrideProps,
+    };
+  }
+
+  static password (overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.STRING,
+      format: SchemaFormat.PASSWORD,
+      ...overrideProps,
+    };
   }
 
   render (): object {

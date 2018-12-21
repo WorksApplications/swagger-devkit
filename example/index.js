@@ -21,13 +21,8 @@ const errObject = new swagger.Component(api, 'Error', {
     'message',
   ],
   properties: {
-    'code': {
-      type: 'integer',
-      format: 'int32',
-    },
-    'message': {
-      type: 'string'
-    }
+    'code': swagger.Schema.int32(),
+    'message': swagger.Schema.string(),
   }
 });
 
@@ -37,16 +32,9 @@ const petObject = new swagger.Component(api, 'Pet', {
     'name',
   ],
   properties: {
-    'id': {
-      type: 'integer',
-      format: 'int64',
-    },
-    'name': {
-      type: 'string',
-    },
-    'tag': {
-      type: 'string',
-    }
+    'id': swagger.Schema.int64(),
+    'name': swagger.Schema.string(),
+    'tag': swagger.Schema.string(),
   },
 });
 
@@ -70,10 +58,7 @@ api.addPath(
     in: 'query',
     description: 'How many items to return at one time (max 100)',
     required: false,
-    schema: {
-      type: 'integer',
-      format: 'int32',
-    },
+    schema: swagger.Schema.int32(),
   })
   .addResponse(
     '200',
@@ -82,9 +67,7 @@ api.addPath(
     })
     .addHeader('x-next', {
       description: 'A link to the next page of responses',
-      schema: {
-        type: 'string'
-      },
+      schema: swagger.Schema.string(),
     })
     .addContent('application/json', petObject)
   )

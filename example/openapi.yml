@@ -28,7 +28,6 @@ paths:
                 $ref: '#/components/schemas/Pet'
         default:
           description: unexpected error
-          headers: {}
           content:
             application/json:
               schema:
@@ -38,15 +37,11 @@ paths:
       operationId: createPets
       tags:
         - pets
-      parameters: []
       responses:
         '201':
           description: Null response
-          headers: {}
-          content: {}
         default:
           description: unexpected error
-          headers: {}
           content:
             application/json:
               schema:
@@ -67,14 +62,12 @@ paths:
       responses:
         '200':
           description: Expected response to a valid request
-          headers: {}
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
-          headers: {}
           content:
             application/json:
               schema:
