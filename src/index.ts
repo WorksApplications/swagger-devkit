@@ -20,6 +20,8 @@ export interface SchemaProps {
   },
   items?: SchemaInput,
   format?: string,
+  example?: string,
+  enum?: Array<string>,
 }
 
 export class Schema {
