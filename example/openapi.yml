@@ -21,17 +21,18 @@ paths:
             x-next:
               description: A link to the next page of responses
               schema:
-                $ref: '#/components/schemas/Pets'
+                type: string
+                items: null
           content:
             application/json:
-              props:
-                $ref: '#/components/schemas/Error'
+              schema:
+                $ref: '#/components/schemas/Pet'
         default:
           description: unexpected error
           headers: {}
           content:
             application/json:
-              props:
+              schema:
                 $ref: '#/components/schemas/Error'
     post:
       summary: Create a pet
@@ -49,7 +50,7 @@ paths:
           headers: {}
           content:
             application/json:
-              props:
+              schema:
                 $ref: '#/components/schemas/Error'
   '/pets/{petId}':
     get:
@@ -70,14 +71,14 @@ paths:
           headers: {}
           content:
             application/json:
-              props:
+              schema:
                 $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           headers: {}
           content:
             application/json:
-              props:
+              schema:
                 $ref: '#/components/schemas/Error'
 info:
   title: Swagger Petstore
@@ -95,3 +96,21 @@ components:
         format: int32
       message:
         type: string
+    items: null
+  Pet:
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      tag:
+        type: string
+    items: null
+  Pets:
+    type: array
+    items:
+      $ref: '#/components/schemas/Pet'

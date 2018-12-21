@@ -1,6 +1,15 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
+  const obj: any = {};
+  arg.forEach((value, key) => {
+    obj[key] = func(value);
+  });
+
+  return obj;
+};
+
 export interface InfoProps {
   title: string,
   description?: string,
@@ -28,63 +37,57 @@ export class Ref {
   }
 }
 
+export type SchemaInput = SchemaProps | Ref;
+
 export interface SchemaProps {
   type: string,
   required?: Array<string>,
   properties?: {
-    [key: string]: SchemaProps | Schema,
+    [key: string]: SchemaInput,
   },
-  items?: SchemaProps | Schema,
+  items?: SchemaInput,
   format?: string,
 }
 
 export class Schema {
-  props: object;
+  props: { "$ref": string } | SchemaProps;
+  is_ref: boolean;
 
-  constructor (props: Ref | SchemaProps) {
+  constructor (props: SchemaInput) {
     if (props instanceof Ref) {
       this.props = { "$ref": props.ref };
+      this.is_ref = true;
     } else {
       this.props = props;
+      this.is_ref = false;
     }
   }
 
   render (): object {
-    return this.props;
+    if (this.is_ref) {
+      return this.props;
+    } else {
+      return Object.assign(
+        this.props,
+        {
+          // Hmmm....
+          // So how to write properties transformation?
+          items: (this.props as SchemaProps).items ? new Schema((this.props as SchemaProps).items).render() : null,
+        }
+      );
+    }
   }
 }
 
-export interface ParameterProps {
-  name: string,
-  in: string,
-  description: string,
-  required: boolean,
-  schema: Schema,
-}
-
-export interface PathProps {
-  summary: string,
-  operationId: string,
-  tags: Array<string>,
-}
-
+// Be careful! This SchemaInput is not converted to Schema in Header object in Response
 export interface HeaderProps {
   description: string,
-  schema: Schema,
+  schema: SchemaInput,
 }
 
 export interface ResponseProps {
   description: string,
 }
-
-function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
-  const obj: any = {};
-  arg.forEach((value, key) => {
-    obj[key] = func(value);
-  });
-
-  return obj;
-};
 
 export class Response {
   props: ResponseProps;
@@ -100,7 +103,7 @@ export class Response {
     return this;
   }
 
-  addContent (contentType: string, schema: Ref | SchemaProps): Response {
+  addContent (contentType: string, schema: SchemaInput): Response {
     this.content.set(contentType, new Schema(schema));
     return this;
   }
@@ -109,11 +112,25 @@ export class Response {
     return Object.assign(
       this.props,
       {
-        headers: mapToObj(this.headers),
-        content: mapToObj(this.content),
+        headers: mapToObj(this.headers, h => Object.assign(h, { schema: new Schema(h.schema).render() })),
+        content: mapToObj(this.content, r => ({ schema: r.render() })),
       }
     )
   }
+}
+
+export interface ParameterProps {
+  name: string,
+  in: string,
+  description: string,
+  required: boolean,
+  schema: SchemaInput,
+}
+
+export interface PathProps {
+  summary: string,
+  operationId: string,
+  tags: Array<string>,
 }
 
 export class Path {
@@ -149,7 +166,7 @@ export class Path {
 export class Component extends Ref {
   schema: Schema;
 
-  constructor (parent: Swagger, name: string, schema: Ref | SchemaProps) {
+  constructor (parent: Swagger, name: string, schema: SchemaInput) {
     super(`#/components/schemas/${name}`);
 
     parent.components.set(name, this);
@@ -203,7 +220,7 @@ export class Swagger {
     });
     this.object['paths'] = pathObject;
 
-    fs.writeFileSync(this.outfile, yaml.dump(Object.assign(
+    fs.writeFileSync(this.outfile, yaml.safeDump(Object.assign(
       this.object,
       {
         paths: pathObject,
