@@ -25,6 +25,8 @@ export interface SchemaProps {
   description?: string,
 }
 
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export class Schema {
   props: { "$ref": string } | SchemaProps;
   is_ref: boolean;
@@ -37,6 +39,10 @@ export class Schema {
       this.props = props;
       this.is_ref = false;
     }
+  }
+
+  static string (props: Omit<SchemaProps, 'type'>): Schema {
+    return new Schema(Object.assign(props, { type: 'string' }));
   }
 
   render (): object {
