@@ -41,10 +41,6 @@ export class Schema {
     }
   }
 
-  static string (props: Omit<SchemaProps, 'type'>): Schema {
-    return new Schema(Object.assign(props, { type: 'string' }));
-  }
-
   render (): object {
     if (this.is_ref) {
       return this.props;
