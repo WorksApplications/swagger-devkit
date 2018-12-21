@@ -137,6 +137,14 @@ export class Path {
   }
 }
 
+export class Ref {
+  ref: string;
+
+  constructor (ref: string) {
+    this.ref = ref;
+  }
+}
+
 export class Component extends Ref {
   schema: Schema;
 
@@ -171,14 +179,6 @@ export enum HttpMethod {
   OPTIONS = <any>"options",
 }
 
-export class Ref {
-  ref: string;
-
-  constructor (ref: string) {
-    this.ref = ref;
-  }
-}
-
 export class Swagger {
   outfile: string = 'openapi.yml';
   object: any = {};
@@ -198,7 +198,7 @@ export class Swagger {
     this.addObject('info', props);
   }
 
-  addServers(props: ServersProps) {
+  addServers(props: Array<ServersProps>) {
     this.addObject('servers', props);
   }
 
