@@ -94,10 +94,8 @@ export class Response {
   render (): object {
     return Object.assign(
       this.props,
-      {
-        headers: mapToObj(this.headers, h => Object.assign(h, { schema: new Schema(h.schema).render() })),
-        content: mapToObj(this.content, r => ({ schema: r.render() })),
-      }
+      this.headers.size !== 0 && { headers: mapToObj(this.headers, h => Object.assign(h, { schema: new Schema(h.schema).render() })) },
+      this.content.size !== 0 && { content: mapToObj(this.content, r => ({ schema: r.render() })) },
     )
   }
 }
@@ -131,9 +129,7 @@ export class RequestBody {
   render (): object {
     return Object.assign(
       this.props,
-      {
-        content: mapToObj(this.content, r => ({ schema: r.render() })),
-      }
+      this.content.size !== 0 && { content: mapToObj(this.content, r => ({ schema: r.render() })) },
     )
   }
 }
@@ -186,11 +182,9 @@ export class Path {
   render (): object {
     return Object.assign(
       this.props,
-      {
-        requestBody: this.requestBody.render(),
-        parameters: this.parameters,
-        responses: mapToObj(this.responses, r => r.render()),
-      }
+      this.requestBody && { requestBody: this.requestBody.render() },
+      this.parameters.length != 0 && { parameters: this.parameters },
+      this.responses.size != 0 && { responses: mapToObj(this.responses, r => r.render()) },
     );
   }
 }
