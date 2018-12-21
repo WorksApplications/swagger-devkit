@@ -101,6 +101,34 @@ export interface ParameterProps {
   schema: SchemaInput,
 }
 
+export interface RequestBodyProps {
+  description: string,
+  required: boolean,
+}
+
+export class RequestBody {
+  props: RequestBodyProps;
+  content: Map<string, Schema> = new Map();
+
+  constructor (props: RequestBodyProps) {
+    this.props = props;
+  }
+
+  addContent (contentType: string, schema: SchemaInput): RequestBody {
+    this.content.set(contentType, new Schema(schema));
+    return this;
+  }
+
+  render (): object {
+    return Object.assign(
+      this.props,
+      {
+        content: mapToObj(this.content, r => ({ schema: r.render() })),
+      }
+    )
+  }
+}
+
 export interface PathProps {
   summary: string,
   operationId: string,
@@ -111,6 +139,7 @@ export class Path {
   props: PathProps;
   parameters: Array<ParameterProps> = [];
   responses: Map<string, Response> = new Map();
+  requestBody: RequestBody;
 
   constructor (props: PathProps) {
     this.props = props;
@@ -126,10 +155,16 @@ export class Path {
     return this;
   }
 
+  addRequestBody (requestBody: RequestBody): Path {
+    this.requestBody = requestBody;
+    return this;
+  }
+
   render (): object {
     return Object.assign(
       this.props,
       {
+        requestBody: this.requestBody.render(),
         parameters: this.parameters,
         responses: mapToObj(this.responses, r => r.render()),
       }
@@ -168,6 +203,7 @@ export interface InfoProps {
 
 export interface ServersProps {
   url: string,
+  description?: string,
 }
 
 export enum HttpMethod {
