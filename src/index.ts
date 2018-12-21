@@ -159,8 +159,13 @@ export class Path {
     return this;
   }
 
-  addResponse (statusCode: string, object: Response): Path {
-    this.responses.set(statusCode, object);
+  addResponse (statusCode: string, object: Response | ResponseProps): Path {
+    if (object instanceof Response) {
+      this.responses.set(statusCode, object);
+    } else {
+      this.responses.set(statusCode, new Response(object));
+    }
+    
     return this;
   }
 
