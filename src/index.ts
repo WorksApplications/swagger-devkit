@@ -285,6 +285,8 @@ export class Swagger {
           schemas: mapToObj(this.components, r => r.render())
         },
       }
-    )));
+    ), {
+      noRefs: true,
+    }));
   }
 }
