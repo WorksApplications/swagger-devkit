@@ -10,33 +10,6 @@ function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) 
   return obj;
 };
 
-export interface InfoProps {
-  title: string,
-  description?: string,
-  version?: string,
-}
-
-export interface ServersProps {
-  url: string,
-}
-
-export enum HttpMethod {
-  POST = <any>"post",
-  GET = <any>"get",
-  PUT = <any>"put",
-  DELETE = <any>"delete",
-  PATCH = <any>"patch",
-  OPTIONS = <any>"options",
-}
-
-export class Ref {
-  ref: string;
-
-  constructor (ref: string) {
-    this.ref = ref;
-  }
-}
-
 export type SchemaInput = SchemaProps | Ref;
 
 export interface SchemaProps {
@@ -176,6 +149,33 @@ export class Component extends Ref {
 
   render (): object {
     return this.schema.render();
+  }
+}
+
+export interface InfoProps {
+  title: string,
+  description?: string,
+  version?: string,
+}
+
+export interface ServersProps {
+  url: string,
+}
+
+export enum HttpMethod {
+  POST = <any>"post",
+  GET = <any>"get",
+  PUT = <any>"put",
+  DELETE = <any>"delete",
+  PATCH = <any>"patch",
+  OPTIONS = <any>"options",
+}
+
+export class Ref {
+  ref: string;
+
+  constructor (ref: string) {
+    this.ref = ref;
   }
 }
 
