@@ -209,6 +209,179 @@ describe('Swagger', () => {
   
       expect(actual).toEqual(expect.objectContaining(expected));
     });
+
+    it('should add paths object with parameter', () => {
+      const swagger = new devkit.Swagger();
+
+      const expected = yaml.safeLoad(`
+      paths:
+        /pets:
+          get:
+            description: Returns pets based on ID
+            summary: Find pets by ID
+            operationId: getPetsById
+            parameters:
+            - name: id
+              in: path
+              description: ID of pet to use
+              required: true
+              schema:
+                type: array
+                style: simple
+                items:
+                  type: string  
+            responses:
+              '200':
+                description: pet response
+                content:
+                  '*/*' :
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Pet'
+              default:
+                description: error payload
+                content:
+                  'text/html':
+                    schema:
+                      $ref: '#/components/schemas/ErrorModel'
+      `);
+
+      swagger.addPath(
+        '/pets',
+        devkit.HttpMethod.GET,
+        new devkit.Path({
+          description: 'Returns pets based on ID',
+          summary: 'Find pets by ID',
+          operationId: 'getPetsById',
+        })
+        .addParameter({
+          name: 'id',
+          in: 'path',
+          description: 'ID of pet to use',
+          required: true,
+          schema: devkit.Schema.array(devkit.Schema.string(), {
+            style: 'simple'
+          })
+        })
+        .addResponse('200',
+          new devkit.Response({
+            description: 'pet response'
+          })
+          .addContent('*/*', devkit.Schema.array(new devkit.Ref('#/components/schemas/Pet')))
+        )
+        .addResponse('default',
+          new devkit.Response({
+            description: 'error payload'
+          })
+          .addContent('text/html', new devkit.Ref('#/components/schemas/ErrorModel'))
+        )
+      );
+  
+      const actual: any = swagger.render();
+  
+      expect(actual).toEqual(expect.objectContaining(expected));
+    });
+  });
+
+  describe('Operation Object', () => {
+    it('should add paths object with requestBody and responses', () => {
+      const swagger = new devkit.Swagger();
+
+      const expected = yaml.safeLoad(`
+      paths:
+        /pets/{petId}:
+          put:
+            tags:
+            - pet
+            summary: Updates a pet in the store with form data
+            operationId: updatePetWithForm
+            parameters:
+            - name: petId
+              in: path
+              description: ID of pet that needs to be updated
+              required: true
+              schema:
+                type: string
+            requestBody:
+              content:
+                'application/x-www-form-urlencoded':
+                  schema:
+                    properties:
+                      name: 
+                        description: Updated name of the pet
+                        type: string
+                      status:
+                        description: Updated status of the pet
+                        type: string
+                    required:
+                      - status
+            responses:
+              '200':
+                description: Pet updated.
+                content: 
+                  'application/json': {}
+                  'application/xml': {}
+              '405':
+                description: Method Not Allowed
+                content: 
+                  'application/json': {}
+                  'application/xml': {}
+            security:
+              petstore_auth:
+              - write:pets
+              - read:pets`);
+
+      swagger.addPath(
+        '/pets/{petId}',
+        devkit.HttpMethod.PUT,
+        new devkit.Path({
+          tags: [ 'pet' ],
+          summary: 'Updates a pet in the store with form data',
+          operationId: 'updatePetWithForm',
+          security: {
+            petstore_auth: [
+              'write:pets',
+              'read:pets',
+            ]
+          }
+        })
+        .addParameter({
+          name: 'petId',
+          in: 'path',
+          description: 'ID of pet that needs to be updated',
+          required: true,
+          schema: devkit.Schema.string(),
+        })
+        .addRequestBody(
+          new devkit.RequestBody().addContent('application/x-www-form-urlencoded', {
+            properties: {
+              name: devkit.Schema.string({ description: 'Updated name of the pet' }),
+              status: devkit.Schema.string({ description: 'Updated status of the pet' }),
+            },
+            required: [ 'status' ]
+          })
+        )
+        .addResponse('200',
+          new devkit.Response({
+            description: 'Pet updated.'
+          })
+          .addContent('application/json', {})
+          .addContent('application/xml', {})
+        )
+        .addResponse('405',
+          new devkit.Response({
+            description: 'Method Not Allowed'
+          })
+          .addContent('application/json', {})
+          .addContent('application/xml', {})
+        )
+      );
+  
+      const actual: any = swagger.render();
+  
+      expect(actual).toEqual(expect.objectContaining(expected));
+    });
   });
 });
 

@@ -40,6 +40,7 @@ export interface SchemaProps {
   properties?: {
     [key: string]: SchemaInput,
   },
+  style?: string,
   items?: SchemaInput,
   format?: SchemaFormat | string,
   example?: string,
@@ -218,7 +219,7 @@ export class Response {
     return Object.assign(
       this.props,
       this.headers.size !== 0 && { headers: mapToObj(this.headers, h => Object.assign(h, { schema: new Schema(h.schema).render() })) },
-      this.content.size !== 0 && { content: mapToObj(this.content, r => ({ schema: r.render() })) },
+      this.content.size !== 0 && { content: mapToObj(this.content, r => (Object.keys(r.render()).length > 0 ? { schema: r.render() } : {})) },
     )
   }
 }
@@ -265,7 +266,7 @@ export class RequestBody {
   props: RequestBodyProps;
   content: Map<string, Schema> = new Map();
 
-  constructor (props: RequestBodyProps) {
+  constructor (props: RequestBodyProps = {}) {
     this.props = props;
   }
 
@@ -287,6 +288,7 @@ export interface PathProps {
   operationId?: string,
   tags?: Array<string>,
   description?: string,
+  security?: { [key: string]: Array<string> },
 }
 
 export class Path {
