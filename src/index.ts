@@ -169,7 +169,8 @@ export interface ResponseProps {
   description: string,
 }
 
-export type HeaderProps = Exclude<ParameterProps, { name: string, in: string }>;
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+export type HeaderProps = Omit<ParameterProps, "name" | "in">;
 
 export interface EncodingProps {
   contentType?: string,
