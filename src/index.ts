@@ -356,7 +356,7 @@ export class Swagger {
     this.paths.get(path).set(method, object);
   }
 
-  run () {
+  render (): object {
     let pathObject: any = {};
     this.paths.forEach((methods, path) => {
       pathObject[path] = {};
@@ -367,7 +367,7 @@ export class Swagger {
     });
     this.object['paths'] = pathObject;
 
-    fs.writeFileSync(this.outfile, yaml.safeDump(Object.assign(
+    return Object.assign(
       this.object,
       {
         paths: pathObject,
@@ -375,7 +375,11 @@ export class Swagger {
           schemas: mapToObj(this.components, r => r.render())
         },
       }
-    ), {
+    );
+  }
+
+  run () {
+    fs.writeFileSync(this.outfile, yaml.safeDump(this.render(), {
       noRefs: true,
     }));
   }
