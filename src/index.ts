@@ -34,7 +34,7 @@ export enum SchemaFormat {
 }
 
 export interface SchemaProps {
-  type: SchemaType | string,
+  type?: SchemaType | string,
   required?: Array<string>,
   properties?: {
     [key: string]: SchemaInput,
@@ -134,6 +134,14 @@ export class Schema {
     return {
       type: SchemaType.STRING,
       format: SchemaFormat.PASSWORD,
+      ...overrideProps,
+    };
+  }
+
+  static array (items: SchemaInput, overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.ARRAY,
+      items,
       ...overrideProps,
     };
   }
@@ -308,7 +316,11 @@ export class Component extends Ref {
 export interface InfoProps {
   title: string,
   description?: string,
-  version?: string,
+  version: string,
+  license?: {
+    name: string,
+    url?: string
+  },
 }
 
 export interface ServersProps {
