@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
+import { url } from 'inspector';
 
 function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
   const obj: any = {};
@@ -164,13 +165,25 @@ export class Schema {
 }
 
 // Be careful! This SchemaInput is not converted to Schema in Header object in Response
-export interface HeaderProps {
-  description: string,
-  schema: SchemaInput,
-}
-
 export interface ResponseProps {
   description: string,
+}
+
+export type HeaderProps = Exclude<ParameterProps, { name: string, in: string }>;
+
+export interface EncodingProps {
+  contentType?: string,
+  headers?: { [key: string]: HeaderProps },
+  style?: string,
+  explode?: boolean,
+  allowReserved?: boolean,
+}
+
+export interface MediaTypeObject {
+  schema?: SchemaInput,
+  example?: any,
+  examples?: { [key: string]: any },
+  encoding?: { [key: string]: EncodingProps },
 }
 
 export class Response {
@@ -201,17 +214,42 @@ export class Response {
   }
 }
 
+export enum ParameterLocation {
+  PATH = <any>"path",
+  HEADER = <any>"header",
+  QUERY = <any>"query",
+  COOKIE = <any>"cookie",
+}
+
+export enum ParameterStyle {
+  MATRIX = <any>"matrix",
+  LABEL = <any>"label",
+  FORM = <any>"form",
+  SIMPLE = <any>"simple",
+  SPACEDELIMITED = <any>"spaceDelimited",
+  PIPEDELIMITED = <any>"pipeDelimited",
+  deepObject = <any>"deepObject",
+}
+
 export interface ParameterProps {
   name: string,
-  in: string,
-  description: string,
-  required: boolean,
-  schema: SchemaInput,
+  in: ParameterLocation | string,
+  description?: string,
+  required?: boolean,
+  deprecated?: boolean,
+  allowEmptyValue?: boolean,
+
+  style?: ParameterStyle | string,
+  explode?: boolean,
+  allowReserved?: boolean,
+  schema?: SchemaInput,
+  example?: any,
+  examples?: { [key: string]: any },
 }
 
 export interface RequestBodyProps {
-  description: string,
-  required: boolean,
+  description?: string,
+  required?: boolean,
 }
 
 export class RequestBody {
@@ -316,25 +354,40 @@ export class Component extends Ref {
 export interface InfoProps {
   title: string,
   description?: string,
-  version: string,
+  termsOfService?: string,
+  contact?: {
+    name?: string,
+    url: string,
+    email: string,
+  },
   license?: {
     name: string,
     url?: string
   },
+  version: string,
 }
 
-export interface ServersProps {
-  url: string,
+export interface ServerVariableProps {
+  enum?: Array<string>,
+  default: string,
   description?: string,
 }
 
+export interface ServerProps {
+  url: string,
+  description?: string,
+  variables?: { [key: string]: ServerVariableProps }
+}
+
 export enum HttpMethod {
-  POST = <any>"post",
   GET = <any>"get",
   PUT = <any>"put",
+  POST = <any>"post",
   DELETE = <any>"delete",
-  PATCH = <any>"patch",
   OPTIONS = <any>"options",
+  HEAD = <any>"head",
+  PATCH = <any>"patch",
+  TRACE = <any>"trace",
 }
 
 export class Swagger {
@@ -356,7 +409,7 @@ export class Swagger {
     this.addObject('info', props);
   }
 
-  addServers(props: Array<ServersProps>) {
+  addServers(props: Array<ServerProps>) {
     this.addObject('servers', props);
   }
 

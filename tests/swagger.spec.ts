@@ -18,7 +18,7 @@ describe('Swagger', () => {
   });
 
   it('should add servers', () => {
-    const serversProps: Array<devkit.ServersProps> = [
+    const serversProps: Array<devkit.ServerProps> = [
       {
         url: 'http://serverA.com',
         description: 'serverA',
