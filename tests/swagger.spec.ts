@@ -119,25 +119,96 @@ describe('Swagger', () => {
     });
   });
 
-  it('should add servers', () => {
-    const swagger = new devkit.Swagger();
+  describe('Components Object', () => {
+    it('should define schemas', () => {
+      const swagger = new devkit.Swagger();
 
-    const serversProps: Array<devkit.ServerProps> = [
-      {
-        url: 'http://serverA.com',
-        description: 'serverA',
-      },
-      {
-        url: 'http://serverB.com',
-        description: 'serverB',
-      },
-    ];
+      const expected = yaml.safeLoad(`
+      components:
+        schemas:
+          GeneralError:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+          Category:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              name:
+                type: string
+          Tag:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              name:
+                type: string
+      `);
 
-    swagger.addServers(serversProps);
+      new devkit.Component(swagger, 'GeneralError', devkit.Schema.object({
+        code: devkit.Schema.int32(),
+        message: devkit.Schema.string(),
+      }))
+      new devkit.Component(swagger, 'Category', devkit.Schema.object({
+        id: devkit.Schema.int64(),
+        name: devkit.Schema.string(),
+      }))
+      new devkit.Component(swagger, 'Tag', devkit.Schema.object({
+        id: devkit.Schema.int64(),
+        name: devkit.Schema.string(),
+      }))
+  
+      const actual: any = swagger.render();
+  
+      expect(actual).toEqual(expect.objectContaining(expected));
+    });
+  });
 
-    const actual: any = swagger.render();
+  describe('Paths Object', () => {
+    it('should add paths object', () => {
+      const swagger = new devkit.Swagger();
 
-    expect(actual['servers']).toBe(serversProps);
+      const expected = yaml.safeLoad(`
+      paths:
+        /pets:
+          get:
+            description: Returns all pets from the system that the user has access to
+            responses:
+              '200':
+                description: A list of pets.
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/pet'
+      `);
+
+      swagger.addPath(
+        '/pets',
+        devkit.HttpMethod.GET,
+        new devkit.Path({
+          description: 'Returns all pets from the system that the user has access to',
+        })
+        .addResponse('200',
+          new devkit.Response({
+            description: 'A list of pets.'
+          })
+          .addContent('application/json', devkit.Schema.array(new devkit.Ref('#/components/schemas/pet')))
+        )
+      );
+  
+      const actual: any = swagger.render();
+  
+      expect(actual).toEqual(expect.objectContaining(expected));
+    });
   });
 });
 

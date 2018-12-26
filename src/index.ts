@@ -147,6 +147,14 @@ export class Schema {
     };
   }
 
+  static object (properties: { [key: string]: SchemaProps }, overrideProps?: Partial<SchemaProps>): SchemaProps {
+    return {
+      type: SchemaType.OBJECT,
+      properties,
+      ...overrideProps,
+    };
+  }
+
   render (): object {
     if (this.is_ref) {
       return this.props;
@@ -275,9 +283,10 @@ export class RequestBody {
 }
 
 export interface PathProps {
-  summary: string,
-  operationId: string,
-  tags: Array<string>,
+  summary?: string,
+  operationId?: string,
+  tags?: Array<string>,
+  description?: string,
 }
 
 export class Path {
