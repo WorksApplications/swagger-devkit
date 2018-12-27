@@ -25,7 +25,7 @@ export class ServerlessPlugin extends devkit.Plugin {
     this.pathOptions.set(ServerlessPlugin.generatePathKey(path, method), options);
   }
 
-  run (swagger: devkit.SwaggerRepr) {
+  run (iohandler: (filename: string, content: string) => void, swagger: devkit.SwaggerRepr) {
     let object: any = {};
 
     swagger.paths.forEach((pathMap, url) => {
@@ -53,6 +53,6 @@ export class ServerlessPlugin extends devkit.Plugin {
       });
     });
 
-    fs.writeFileSync(this.options.filepath, yaml.safeDump(object));
+    iohandler(this.options.filepath, yaml.safeDump(object));
   }
 }

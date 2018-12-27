@@ -409,7 +409,7 @@ export interface SwaggerRepr {
 
 export class Plugin {
   addPathOptions (path: string, method: HttpMethod, options: object) {}
-  run (swagger: SwaggerRepr) {}
+  run (iohandler: (filename: string, content: string) => void, swagger: SwaggerRepr) {}
 }
 
 export interface SwaggerOptions {
@@ -487,12 +487,16 @@ export class Swagger {
   }
 
   run () {
-    fs.writeFileSync(this.outfile, yaml.safeDump(this.render(), {
+    const iohandler = (filename: string, content: string) => {
+      fs.writeFileSync(filename, content);
+    };
+
+    iohandler(this.outfile, yaml.safeDump(this.render(), {
       noRefs: true,
     }));
 
     Object.keys(this.plugins).forEach(pluginName => {
-      this.plugins[pluginName].run({
+      this.plugins[pluginName].run(iohandler, {
         paths: this.paths,
         components: this.components,
       });
