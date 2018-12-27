@@ -402,8 +402,18 @@ export enum HttpMethod {
   TRACE = <any>"trace",
 }
 
+export interface SwaggerRepr {
+  paths: Map<string, Map<HttpMethod, Path>>,
+  components: Map<string, Component>,
+}
+
 export class Plugin {
-  run (swagger: { paths: Map<string, Map<HttpMethod, Path>>, components: Map<string, Component> }) {}
+  run (swagger: SwaggerRepr) {}
+}
+
+export interface SwaggerOptions {
+  openapi?: string,
+  plugins?: { [pluginName: string]: Plugin },
 }
 
 export class Swagger {
@@ -413,12 +423,17 @@ export class Swagger {
   components: Map<string, Component> = new Map();
   plugins: { [pluginName: string]: Plugin } = {};
 
-  constructor (openapi: string = '3.0.0', plugins?: { [pluginName: string]: Plugin }) {
-    this.addObject('openapi', openapi);
+  constructor (options?: SwaggerOptions) {
+    if (options && options.openapi) {
+      this.addObject('openapi', options.openapi);
+    } else {
+      this.addObject('openapi', '3.0.0');
+    }
+
     this.addObject('paths', {});
 
-    if (plugins) {
-      this.plugins = plugins;
+    if (options && options.plugins) {
+      this.plugins = options.plugins;
     }
   }
 

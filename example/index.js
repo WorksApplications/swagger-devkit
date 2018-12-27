@@ -1,6 +1,13 @@
 const swagger = require('../dist');
+const serverless = require('../dist/plugins/serverless');
 
-const api = new swagger.Swagger();
+const api = new swagger.Swagger({
+  plugins: {
+    serverless: new serverless.ServerlessPlugin({
+      filepath: './test.yaml',
+    }),
+  }
+});
 
 api.addInfo({
   title: 'Swagger Petstore',
