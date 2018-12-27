@@ -16,8 +16,12 @@ export class ServerlessPlugin extends devkit.Plugin {
     this.options = options;
   }
 
+  static generatePathKey(path: string, method: devkit.HttpMethod): string {
+    return `${path}#${method}`;
+  }
+
   addPathOptions (path: string, method: devkit.HttpMethod, options: object) {
-    this.pathOptions.set(`${path}#${method}`, options);
+    this.pathOptions.set(ServerlessPlugin.generatePathKey(path, method), options);
   }
 
   run (swagger: devkit.SwaggerRepr) {
@@ -33,7 +37,7 @@ export class ServerlessPlugin extends devkit.Plugin {
               http: Object.assign({
                 path: url,
                 method: method,
-              }, this.pathOptions.get(`${url}#${method}`))
+              }, this.pathOptions.get(ServerlessPlugin.generatePathKey(url, method)))
             }
           ]
         };
