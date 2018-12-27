@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import { url } from 'inspector';
 
 function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
   const obj: any = {};
@@ -289,6 +288,7 @@ export interface PathProps {
   tags?: Array<string>,
   description?: string,
   security?: { [key: string]: Array<string> },
+  parameters?: Array<ParameterProps>,
 }
 
 export class Path {
