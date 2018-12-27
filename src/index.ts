@@ -486,10 +486,14 @@ export class Swagger {
     );
   }
 
-  run () {
-    const iohandler = (filename: string, content: string) => {
-      fs.writeFileSync(filename, content);
-    };
+  run (options?: { dry: boolean }) {
+    const iohandler =
+      options.dry ? (filename: string, content: string) => {
+        console.log(`=== output to '${filename}' ===`);
+        console.log(content);
+      } : (filename: string, content: string) => {
+        fs.writeFileSync(filename, content);
+      };
 
     iohandler(this.outfile, yaml.safeDump(this.render(), {
       noRefs: true,

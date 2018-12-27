@@ -165,4 +165,6 @@ api.addPath(
   }
 );
 
-api.run();
+api.run({
+  dry: true
+});
