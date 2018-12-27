@@ -408,6 +408,7 @@ export interface SwaggerRepr {
 }
 
 export class Plugin {
+  addPathOptions (path: string, method: HttpMethod, options: object) {}
   run (swagger: SwaggerRepr) {}
 }
 
@@ -449,12 +450,18 @@ export class Swagger {
     this.addObject('servers', props);
   }
 
-  addPath(path: string, method: HttpMethod, object: Path) {
+  addPath(path: string, method: HttpMethod, object: Path, pluginOptions?: { [pluginName: string]: object }) {
     if (!this.paths.has(path)) {
       this.paths.set(path, new Map());
     }
 
     this.paths.get(path).set(method, object);
+    
+    if (pluginOptions) {
+      Object.keys(pluginOptions).forEach((name) => {
+        this.plugins[name].addPathOptions(path, method, pluginOptions[name]);
+      });
+    }
   }
 
   render (): object {

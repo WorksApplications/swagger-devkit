@@ -8,11 +8,16 @@ export interface ServerlessOptions {
 
 export class ServerlessPlugin extends devkit.Plugin {
   options: ServerlessOptions;
+  pathOptions: Map<string, object> = new Map();
 
   constructor (options: ServerlessOptions) {
     super();
 
     this.options = options;
+  }
+
+  addPathOptions (path: string, method: devkit.HttpMethod, options: object) {
+    this.pathOptions.set(`${path}#${method}`, options);
   }
 
   run (swagger: devkit.SwaggerRepr) {
@@ -21,13 +26,14 @@ export class ServerlessPlugin extends devkit.Plugin {
     swagger.paths.forEach((pathMap, url) => {
       pathMap.forEach((path, method) => {
         const name = `${url.split('{').join('_').split('}').join('_').split('/').join('')}_${method}`;
+
         object[name] = {
           events: [
             {
-              http: {
+              http: Object.assign({
                 path: url,
                 method: method,
-              }
+              }, this.pathOptions.get(`${url}#${method}`))
             }
           ]
         };

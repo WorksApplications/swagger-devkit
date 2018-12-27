@@ -140,7 +140,12 @@ api.addPath(
       description: 'unexpected error',
     })
     .addContent('application/json', errObject)
-  )
+  ),
+  {
+    serverless: {
+      cors: true
+    }
+  }
 );
 
 api.run();
