@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 export interface ServerlessOptions {
   filepath: string,
+  aggregateByFunctionName?: boolean,
 }
 
 export class ServerlessPlugin extends devkit.Plugin {
@@ -29,18 +30,26 @@ export class ServerlessPlugin extends devkit.Plugin {
 
     swagger.paths.forEach((pathMap, url) => {
       pathMap.forEach((path, method) => {
-        const name = `${url.split('{').join('_').split('}').join('_').split('/').join('')}_${method}`;
+        const pathOptions: any = this.pathOptions.get(ServerlessPlugin.generatePathKey(url,method));
 
-        object[name] = {
-          events: [
-            {
-              http: Object.assign({
-                path: url,
-                method: method,
-              }, this.pathOptions.get(ServerlessPlugin.generatePathKey(url, method)))
-            }
-          ]
-        };
+        if (this.options.aggregateByFunctionName && (!pathOptions || !pathOptions['functionName'])) {
+          throw new Error(`Specify 'functionName' under aggregateByFunctionName mode for the path: ${method} ${url}`);
+        }
+
+        const name = this.options.aggregateByFunctionName
+          ? pathOptions['functionName']
+          : `${url.split('{').join('_').split('}').join('_').split('/').join('')}_${method}`;
+
+        if (!object[name]) {
+          object[name] = { events: [] };
+        }
+
+        object[name]['events'].push({
+          http: Object.assign({
+            path: url,
+            method: method,
+          }, pathOptions['apigateway'])
+        });
       });
     });
 

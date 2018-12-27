@@ -5,6 +5,7 @@ const api = new swagger.Swagger({
   plugins: {
     serverless: new serverless.ServerlessPlugin({
       filepath: './test.yaml',
+      aggregateByFunctionName: true,
     }),
   }
 });
@@ -84,7 +85,12 @@ api.addPath(
       description: 'unexpected error',
     })
     .addContent('application/json', errObject)
-  )
+  ),
+  {
+    serverless: {
+      functionName: 'pets',
+    }
+  }
 );
 
 api.addPath(
@@ -107,7 +113,15 @@ api.addPath(
       description: 'unexpected error',
     })
     .addContent('application/json', errObject)
-  )
+  ),
+  {
+    serverless: {
+      functionName: 'pets',
+      apigateway: {
+        cors: true
+      }
+    }
+  }
 )
 
 api.addPath(
@@ -143,7 +157,10 @@ api.addPath(
   ),
   {
     serverless: {
-      cors: true
+      functionName: 'pets',
+      apigateway: {
+        cors: true
+      }
     }
   }
 );
