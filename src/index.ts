@@ -402,15 +402,24 @@ export enum HttpMethod {
   TRACE = <any>"trace",
 }
 
+export class Plugin {
+  run (swagger: { paths: Map<string, Map<HttpMethod, Path>>, components: Map<string, Component> }) {}
+}
+
 export class Swagger {
   outfile: string = 'openapi.yml';
   object: any = {};
   paths: Map<string, Map<HttpMethod, Path>> = new Map();
   components: Map<string, Component> = new Map();
+  plugins: { [pluginName: string]: Plugin } = {};
 
-  constructor (openapi: string = '3.0.0') {
+  constructor (openapi: string = '3.0.0', plugins?: { [pluginName: string]: Plugin }) {
     this.addObject('openapi', openapi);
     this.addObject('paths', {});
+
+    if (plugins) {
+      this.plugins = plugins;
+    }
   }
 
   private addObject (key: string, value: any) {
@@ -459,5 +468,12 @@ export class Swagger {
     fs.writeFileSync(this.outfile, yaml.safeDump(this.render(), {
       noRefs: true,
     }));
+
+    Object.keys(this.plugins).forEach(pluginName => {
+      this.plugins[pluginName].run({
+        paths: this.paths,
+        components: this.components,
+      });
+    });
   }
 }
