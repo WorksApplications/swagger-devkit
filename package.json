@@ -1,13 +1,7 @@
 {
   "name": "swagger-devkit",
   "version": "0.1.0",
-  "main": "index.js",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "test": "jest"
-  },
+  "description": "swagger development kit",
   "dependencies": {
     "@types/js-yaml": "^3.11.3",
     "@types/node": "^10.12.18",
@@ -18,5 +12,17 @@
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "typescript": "^3.2.2"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "Apache License 2.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "watch": "tsc -w"
+  },
+  "types": "./dist/index.d.ts"
 }
