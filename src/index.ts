@@ -168,10 +168,6 @@ export class Schema {
     } else {
       let object = this.props as SchemaProps;
 
-      if (object.items) {
-        object = Object.assign(object, { items: new Schema(object.items).render() });
-      }
-
       // Hmm, how to write properties transformation?
 
       return Object.assign(
