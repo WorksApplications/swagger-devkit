@@ -42,7 +42,7 @@ export interface SchemaProps {
   style?: string,
   items?: SchemaInput,
   format?: SchemaFormat | string,
-  example?: string,
+  example?: any,
   enum?: Array<string>,
   description?: string,
 }
