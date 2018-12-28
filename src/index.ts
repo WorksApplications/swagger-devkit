@@ -45,6 +45,13 @@ export interface SchemaProps {
   example?: any,
   enum?: Array<string>,
   description?: string,
+
+  oneOf?: Array<SchemaInput>,
+  allOf?: Array<SchemaInput>,
+  anyOf?: Array<SchemaInput>,
+  not?: SchemaInput,
+  additionalProperties?: boolean,
+  default?: any,
 }
 
 export class Schema {
@@ -167,7 +174,14 @@ export class Schema {
 
       // Hmm, how to write properties transformation?
 
-      return object;
+      return Object.assign(
+        object,
+        object.items && { items: new Schema(object.items).render() },
+        object.oneOf && { oneOf: object.oneOf.map(schema => new Schema(schema).render()) },
+        object.anyOf && { anyOf: object.anyOf.map(schema => new Schema(schema).render()) },
+        object.allOf && { allOf: object.allOf.map(schema => new Schema(schema).render()) },
+        object.not && { not: new Schema(object.not).render() },
+      );
     }
   }
 }
