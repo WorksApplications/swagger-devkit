@@ -428,6 +428,7 @@ export class Plugin {
 
 export interface SwaggerOptions {
   openapi?: string,
+  outfile?: string,
   plugins?: { [pluginName: string]: Plugin },
 }
 
@@ -449,6 +450,10 @@ export class Swagger {
 
     if (options && options.plugins) {
       this.plugins = options.plugins;
+    }
+
+    if (options && options.outfile) {
+      this.outfile = options.outfile;
     }
   }
 
