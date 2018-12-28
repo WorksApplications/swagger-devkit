@@ -507,7 +507,7 @@ export class Swagger {
 
   run (options?: { dry: boolean }) {
     const iohandler =
-      options.dry ? (filename: string, content: string) => {
+      options && options.dry ? (filename: string, content: string) => {
         console.log(`=== output to '${filename}' ===`);
         console.log(content);
       } : (filename: string, content: string) => {
