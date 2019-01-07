@@ -426,12 +426,21 @@ export class Plugin {
   run (iohandler: (filename: string, content: string) => void, swagger: SwaggerRepr) {}
 }
 
+/**
+ * @interface Options for Swagger class.
+ */
 export interface SwaggerOptions {
+  /** Version of OpenAPI (default is `3.0.0` and only OpenAPI3 is supported) */
   openapi?: string,
+  /** Specifies the filename for output */
   outfile?: string,
+  /** Install external plugins */
   plugins?: { [pluginName: string]: Plugin },
 }
 
+/**
+ * @class The core class of swagger-devkit. See `SwaggerOptions` for constructor options.
+ */
 export class Swagger {
   outfile: string = 'openapi.yml';
   object: any = {};
@@ -461,14 +470,27 @@ export class Swagger {
     this.object[key] = value;
   }
 
+  /**
+   * Adds `info` section
+   */
   addInfo(props: InfoProps) {
     this.addObject('info', props);
   }
 
+  /**
+   * Adds `servers` section
+   */
   addServers(props: Array<ServerProps>) {
     this.addObject('servers', props);
   }
 
+  /**
+   * Adds a new path for `paths` section
+   * @param path URI for the path
+   * @param method HTTP method for the path
+   * @param object The path object
+   * @param pluginOptions List options with each external plugin name
+   */
   addPath(path: string, method: HttpMethod, object: Path, pluginOptions?: { [pluginName: string]: object }) {
     if (!this.paths.has(path)) {
       this.paths.set(path, new Map());
@@ -483,6 +505,9 @@ export class Swagger {
     }
   }
 
+  /**
+   * Generates an object that represents the swagger structure
+   */
   render (): object {
     let pathObject: any = {};
     this.paths.forEach((methods, path) => {
@@ -505,6 +530,9 @@ export class Swagger {
     );
   }
 
+  /**
+   * Generate a yaml file
+   */
   run (options?: { dry: boolean }) {
     const iohandler =
       options && options.dry ? (filename: string, content: string) => {
