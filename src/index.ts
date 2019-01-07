@@ -55,8 +55,8 @@ export interface SchemaProps {
 }
 
 export class Schema {
-  props: { "$ref": string } | SchemaProps;
-  is_ref: boolean;
+  private props: { "$ref": string } | SchemaProps;
+  private is_ref: boolean;
 
   constructor (props: SchemaInput) {
     if (props instanceof Ref) {
@@ -210,9 +210,9 @@ export interface MediaTypeObject {
 }
 
 export class Response {
-  props: ResponseProps;
-  headers: Map<string, HeaderProps> = new Map();
-  content: Map<string, Schema> = new Map();
+  private props: ResponseProps;
+  private headers: Map<string, HeaderProps> = new Map();
+  private content: Map<string, Schema> = new Map();
 
   constructor (props: ResponseProps) {
     this.props = props;
@@ -276,8 +276,8 @@ export interface RequestBodyProps {
 }
 
 export class RequestBody {
-  props: RequestBodyProps;
-  content: Map<string, Schema> = new Map();
+  private props: RequestBodyProps;
+  private content: Map<string, Schema> = new Map();
 
   constructor (props: RequestBodyProps = {}) {
     this.props = props;
@@ -306,10 +306,10 @@ export interface PathProps {
 }
 
 export class Path {
-  props: PathProps;
-  parameters: Array<ParameterProps> = [];
-  responses: Map<string, Response> = new Map();
-  requestBody: RequestBody;
+  private props: PathProps;
+  private parameters: Array<ParameterProps> = [];
+  private responses: Map<string, Response> = new Map();
+  private requestBody: RequestBody;
 
   constructor (props: PathProps) {
     this.props = props;
@@ -368,7 +368,7 @@ export class Component extends Ref {
   constructor (parent: Swagger, name: string, schema: SchemaInput) {
     super(`#/components/schemas/${name}`);
 
-    parent.components.set(name, this);
+    parent.addComponent(name, this);
     this.schema = new Schema(schema);
   }
 
@@ -442,11 +442,11 @@ export interface SwaggerOptions {
  * @class The core class of swagger-devkit. See `SwaggerOptions` for constructor options.
  */
 export class Swagger {
-  outfile: string = 'openapi.yml';
-  object: any = {};
-  paths: Map<string, Map<HttpMethod, Path>> = new Map();
-  components: Map<string, Component> = new Map();
-  plugins: { [pluginName: string]: Plugin } = {};
+  private outfile: string = 'openapi.yml';
+  private object: any = {};
+  private paths: Map<string, Map<HttpMethod, Path>> = new Map();
+  private components: Map<string, Component> = new Map();
+  private plugins: { [pluginName: string]: Plugin } = {};
 
   constructor (options?: SwaggerOptions) {
     if (options && options.openapi) {
@@ -468,6 +468,13 @@ export class Swagger {
 
   private addObject (key: string, value: any) {
     this.object[key] = value;
+  }
+
+  /**
+   * Adds a component to `components` section
+   */
+  addComponent(name: string, component: Component) {
+    this.components.set(name, component);
   }
 
   /**
