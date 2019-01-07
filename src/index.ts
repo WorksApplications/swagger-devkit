@@ -168,7 +168,11 @@ export class Schema {
     } else {
       let object = this.props as SchemaProps;
 
-      // Hmm, how to write properties transformation?
+      if (object.properties) {
+        Object.keys(object.properties).forEach(key => {
+          object.properties[key] = new Schema(object.properties[key]).render();
+        })
+      }
 
       return Object.assign(
         object,
