@@ -57,6 +57,9 @@ export interface SchemaProps {
   default?: any,
 }
 
+/**
+ * @class Schema class
+ */
 export class Schema {
   private props: { "$ref": string } | SchemaProps;
   private is_ref: boolean;
@@ -360,7 +363,11 @@ export class Path {
   }
 }
 
+/**
+ * @class Represents a reference path for `$ref` field
+ */
 export class Ref {
+  /** e.g.) `#/components/schemas/name` */
   ref: string;
 
   constructor (ref: string) {
@@ -368,9 +375,18 @@ export class Ref {
   }
 }
 
+/**
+ * @class Instantiating this class adds the component immediately.
+ */
 export class Component extends Ref {
-  schema: Schema;
+  private schema: Schema;
 
+  /**
+   * 
+   * @param parent Swagger instance to which the component to be added
+   * @param name Name of the component, should be unique in a swagger object
+   * @param schema Schema of the component
+   */
   constructor (parent: Swagger, name: string, schema: SchemaInput) {
     super(`#/components/schemas/${name}`);
 
