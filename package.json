@@ -1,6 +1,6 @@
 {
   "name": "swagger-devkit",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "swagger development kit",
   "dependencies": {
     "@types/js-yaml": "^3.11.3",
