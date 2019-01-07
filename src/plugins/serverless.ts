@@ -1,6 +1,5 @@
 import * as devkit from '../index';
 import * as yaml from 'js-yaml';
-import * as fs from 'fs';
 
 export interface ServerlessOptions {
   filepath: string,

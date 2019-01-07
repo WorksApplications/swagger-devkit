@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+/**
+ * @private
+ */
 function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
   const obj: any = {};
   arg.forEach((value, key) => {
@@ -191,8 +194,11 @@ export interface ResponseProps {
   description: string,
 }
 
-export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-export type HeaderProps = Omit<ParameterProps, "name" | "in">;
+/** @private */
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+/** @private */
+type HeaderProps = Omit<ParameterProps, "name" | "in">;
 
 export interface EncodingProps {
   contentType?: string,
