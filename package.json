@@ -11,6 +11,7 @@
     "@types/jest": "^23.3.10",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
+    "typedoc": "^0.14.0",
     "typescript": "^3.2.2"
   },
   "files": [
@@ -22,7 +23,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "generate:doc": "yarn typedoc --out docs"
   },
   "types": "./dist/index.d.ts"
 }
