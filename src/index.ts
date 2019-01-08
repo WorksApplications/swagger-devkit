@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
+import * as commandpost from 'commandpost';
 
 /**
  * @private
@@ -470,6 +471,15 @@ export class Swagger {
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
 
+  private command = commandpost
+    .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
+    .version(require('../package.json').version, '-v, --version')
+    .option('-s, --mock-server', 'Start the mock server')
+    .option('--dry-run', 'Dry-run; not actually run the command but show the result')
+    .action((opts, args) => {
+      this.evaluate(opts);
+    });
+
   constructor (options?: SwaggerOptions) {
     if (options && options.openapi) {
       this.addObject('openapi', options.openapi);
@@ -560,9 +570,9 @@ export class Swagger {
   }
 
   /**
-   * Generate a yaml file
+   * Generates a yaml file
    */
-  run (options?: { dry: boolean }) {
+  generate (options?: { dry: boolean }) {
     const iohandler =
       options && options.dry ? (filename: string, content: string) => {
         console.log(`=== output to '${filename}' ===`);
@@ -581,5 +591,34 @@ export class Swagger {
         components: this.components,
       });
     });
+  }
+
+  /**
+   * Evaluates options and arguments
+   * @param options Commandline options for cli
+   */
+  evaluate (options?: { mockServer: boolean, dryRun: boolean }) {
+    if (options.mockServer) {
+      console.log('start a mock server!');
+    } else {
+      this.generate({ dry: options.dryRun });
+    }
+  }
+
+  /**
+   * Runs the swagger-devkit cli
+   */
+  run (options?: { dry: boolean }) {
+    commandpost
+      .exec(this.command, process.argv)
+      .catch(err => {
+        if (err instanceof Error) {
+          console.error(err.stack);
+        } else {
+          console.error(err);
+        }
+
+        process.exit(1);
+      });
   }
 }
