@@ -44,6 +44,11 @@ const petObject = new swagger.Component(api, 'Pet', {
     'name': swagger.Schema.string(),
     'tag': swagger.Schema.string(),
   },
+  example: {
+    id: 100,
+    name: 'foo',
+    tag: 'bar',
+  },
 });
 
 const petsObject = new swagger.Component(api, 'Pets', {
