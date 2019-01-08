@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as commandpost from 'commandpost';
+import * as express from 'express';
 
 /**
  * @private
@@ -37,6 +38,8 @@ export enum SchemaFormat {
   PASSWORD = <any>"password",
 }
 
+// The recursive element SchemaInput should be abstracted as type parameter
+// and is instantiated into Schema class properly?
 export interface SchemaProps {
   type?: SchemaType | string,
   required?: Array<string>,
@@ -63,11 +66,13 @@ export interface SchemaProps {
  */
 export class Schema {
   private props: { "$ref": string } | SchemaProps;
+  private refObject: Ref;
   private is_ref: boolean;
 
   constructor (props: SchemaInput) {
     if (props instanceof Ref) {
       this.props = { "$ref": props.ref };
+      this.refObject = props;
       this.is_ref = true;
     } else {
       this.props = props;
@@ -169,21 +174,39 @@ export class Schema {
     };
   }
 
+  example (): any {
+    if ((this.props as any).example) {
+      return (this.props as any).example;
+    } else if (this.is_ref) {
+      return this.refObject.example();
+    } else {
+      const props = this.props as SchemaProps;
+
+      if (props.type === SchemaType.BOOLEAN) {
+        return true;
+      } else if (props.type === SchemaType.INTEGER) {
+        return 0;
+      } else if (props.type === SchemaType.STRING) {
+        return "";
+      } else if (props.type === SchemaType.ARRAY) {
+        return [ new Schema(props.items).example() ];
+      } else {
+        return Object.keys(props.properties).reduce((prev, current) => Object.assign(prev, { [current]: new Schema(props.properties[current]).example() }), {})
+      }
+    }
+  }
+
   render (): object {
     if (this.is_ref) {
       return this.props;
     } else {
       let object = this.props as SchemaProps;
 
-      if (object.properties) {
-        Object.keys(object.properties).forEach(key => {
-          object.properties[key] = new Schema(object.properties[key]).render();
-        })
-      }
-
       return Object.assign(
         object,
         object.items && { items: new Schema(object.items).render() },
+        object.properties && { properties: Object.keys(object.properties)
+          .reduce((prev, current) => Object.assign(prev, { [current]: new Schema(object.properties[current]).render }), {}) },
         object.oneOf && { oneOf: object.oneOf.map(schema => new Schema(schema).render()) },
         object.anyOf && { anyOf: object.anyOf.map(schema => new Schema(schema).render()) },
         object.allOf && { allOf: object.allOf.map(schema => new Schema(schema).render()) },
@@ -222,7 +245,7 @@ export interface MediaTypeObject {
 export class Response {
   private props: ResponseProps;
   private headers: Map<string, HeaderProps> = new Map();
-  private content: Map<string, Schema> = new Map();
+  content: Map<string, Schema> = new Map();
 
   constructor (props: ResponseProps) {
     this.props = props;
@@ -318,7 +341,7 @@ export interface PathProps {
 export class Path {
   private props: PathProps;
   private parameters: Array<ParameterProps> = [];
-  private responses: Map<string, Response> = new Map();
+  responses: Map<string, Response> = new Map();
   private requestBody: RequestBody;
 
   constructor (props: PathProps) {
@@ -374,6 +397,10 @@ export class Ref {
   constructor (ref: string) {
     this.ref = ref;
   }
+
+  example (): any {
+    throw new Error('not implemented yet');
+  }
 }
 
 /**
@@ -397,6 +424,10 @@ export class Component extends Ref {
 
   render (): object {
     return this.schema.render();
+  }
+
+  example (): any {
+    return this.schema.example();
   }
 }
 
@@ -594,12 +625,42 @@ export class Swagger {
   }
 
   /**
+   * Start a mock server.
+   * The server will respond with some value in `example` section in your path object.
+   * 
+   * @param options.interactionUrl Default is `/interactions`
+   * @param options.port Default is 3000
+   */
+  startMockServer (options?: { interactionUrl?: string, port?: number }) {
+    if (!options) options = {};
+    if (!options.interactionUrl) options.interactionUrl = '/interactions';
+    if (!options.port) options.port = 3000;
+
+    const app = express();
+
+    this.paths.forEach((m, url) => {
+      m.forEach((pathObject, method) => {
+        (app as any)[method](url, (req: express.Request, res: express.Response) => {
+          const statusCode = pathObject.responses.keys().next().value;
+          const responseBody = pathObject.responses.get(statusCode).content.get('application/json').example();
+
+          res.status(parseInt(statusCode, 10)).json(responseBody);
+        })
+      })
+    });
+
+    app.listen(options.port, () => {
+      console.log(`listening to http://localhost:${options.port}...`);
+    });
+  }
+
+  /**
    * Evaluates options and arguments
    * @param options Commandline options for cli
    */
   evaluate (options?: { mockServer: boolean, dryRun: boolean }) {
     if (options.mockServer) {
-      console.log('start a mock server!');
+      this.startMockServer();
     } else {
       this.generate({ dry: options.dryRun });
     }
