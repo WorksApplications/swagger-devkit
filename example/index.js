@@ -77,7 +77,7 @@ api.addPath(
       description: 'A link to the next page of responses',
       schema: swagger.Schema.string(),
     })
-    .addContent('application/json', petObject)
+    .addContent('application/json', petsObject)
   )
   .addResponse(
     'default',
