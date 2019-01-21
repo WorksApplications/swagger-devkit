@@ -612,7 +612,7 @@ export class Swagger {
         fs.writeFileSync(filename, content);
       };
 
-    iohandler(this.outfile, yaml.safeDump(JSON.parse(JSON.stringify(this.render())), {
+    iohandler(this.outfile, yaml.safeDump(this.render(), {
       noRefs: true,
     }));
 
