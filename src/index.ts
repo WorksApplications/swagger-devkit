@@ -206,7 +206,7 @@ export class Schema {
         object,
         object.items && { items: new Schema(object.items).render() },
         object.properties && { properties: Object.keys(object.properties)
-          .reduce((prev, current) => Object.assign(prev, { [current]: new Schema(object.properties[current]).render }), {}) },
+          .reduce((prev, current) => Object.assign(prev, { [current]: new Schema(object.properties[current]).render() }), {}) },
         object.oneOf && { oneOf: object.oneOf.map(schema => new Schema(schema).render()) },
         object.anyOf && { anyOf: object.anyOf.map(schema => new Schema(schema).render()) },
         object.allOf && { allOf: object.allOf.map(schema => new Schema(schema).render()) },
