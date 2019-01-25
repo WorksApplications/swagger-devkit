@@ -537,6 +537,9 @@ export class Swagger {
    * Adds a component to `components` section
    */
   addComponent(name: string, component: Component) {
+    if (this.components.get(name) !== undefined) {
+      throw new Error(`DuplicateComponentKeyException: ${name} is already defined`);
+    }
     this.components.set(name, component);
   }
 
