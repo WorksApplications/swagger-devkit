@@ -183,7 +183,7 @@ describe('Swagger', () => {
           id: devkit.Schema.int64(),
           name: devkit.Schema.string(),
         }))
-      }).toThrow();
+      }).toThrow('DuplicateComponentKeyException');
     });
   });
 
