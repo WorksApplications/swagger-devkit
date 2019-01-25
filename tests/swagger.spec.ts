@@ -169,6 +169,22 @@ describe('Swagger', () => {
   
       expect(actual).toEqual(expect.objectContaining(expected));
     });
+
+    it('key is already defined', () => {
+      const swagger = new devkit.Swagger();
+
+      new devkit.Component(swagger, 'GeneralError', devkit.Schema.object({
+        code: devkit.Schema.int32(),
+        message: devkit.Schema.string(),
+      }))
+      
+      expect( ()=>{
+        new devkit.Component(swagger, 'GeneralError', devkit.Schema.object({
+          id: devkit.Schema.int64(),
+          name: devkit.Schema.string(),
+        }))
+      }).toThrow('DuplicateComponentKeyException');
+    });
   });
 
   describe('Paths Object', () => {
