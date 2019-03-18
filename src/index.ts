@@ -472,6 +472,75 @@ export enum HttpMethod {
   TRACE = <any>"trace",
 }
 
+export type SecurityScheme = {
+  type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect',
+  description?: string,
+} & ({
+  name: string,
+  in: 'query' | 'header' | 'cookie',
+} | {
+  scheme: string,
+  bearerFormat?: string,
+} | {
+  flows: any,
+} | {
+  openIdConnectUrl: string,
+});
+
+class SecuritySchemes {
+  schemes: { [method: string]: SecurityScheme };
+
+  constructor(schemes?: { [method: string]: SecurityScheme }) {
+    this.schemes = schemes || {};
+  }
+
+  addSecurityScheme(method: string, scheme: SecurityScheme): SecuritySchemes {
+    this.schemes[method] = scheme;
+    return this;
+  }
+
+  addBasic (scheme: string, overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecuritySchemes {
+    return this.addSecurityScheme('BasicAuth', {
+      type: 'http',
+      scheme: scheme,
+      ...overrideProps,
+    });
+  }
+
+  addApiKey (in_: 'query' | 'header' | 'cookie', name: string, overrideProps?: Omit<SecurityScheme, 'type' | 'in' | 'name'>): SecuritySchemes {
+    return this.addSecurityScheme('ApiKeyAuth', {
+      type: 'apiKey',
+      in: in_,
+      name: name,
+      ...overrideProps,
+    });
+  }
+
+  addBearer (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecuritySchemes {
+    return this.addSecurityScheme('BearerAuth', {
+      type: 'http',
+      scheme: 'bearer',
+      ...overrideProps,
+    });
+  }
+
+  addOpenID (openIdConnectUrl: string, overrideProps?: Omit<SecurityScheme, 'type' | 'openIdConnectUrl'>): SecuritySchemes {
+    return this.addSecurityScheme('OpenID', {
+      type: 'openIdConnect',
+      openIdConnectUrl,
+      ...overrideProps,
+    });
+  }
+
+  addOAuth2 (flows: any, overrideProps?: Omit<SecurityScheme, 'flows'>): SecuritySchemes {
+    return this.addSecurityScheme('OAuth2', {
+      type: 'oauth2',
+      flows,
+      ...overrideProps,
+    });
+  }
+}
+
 export interface SwaggerRepr {
   paths: Map<string, Map<HttpMethod, Path>>,
   components: Map<string, Component>,
@@ -481,8 +550,6 @@ export class Plugin {
   addPathOptions (path: string, method: HttpMethod, options: object) {}
   run (iohandler: (filename: string, content: string) => void, swagger: SwaggerRepr) {}
 }
-
-
 
 
 /**
