@@ -334,7 +334,7 @@ export interface PathProps {
   operationId?: string,
   tags?: Array<string>,
   description?: string,
-  security?: { [key: string]: Array<string> },
+  security?: Array<{[key: string]: Array<string>}>,
   parameters?: Array<ParameterProps>,
 }
 
