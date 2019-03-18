@@ -403,6 +403,8 @@ export class Ref {
   }
 }
 
+
+
 /**
  * @class Instantiating this class adds the component immediately.
  */
@@ -480,6 +482,9 @@ export class Plugin {
   run (iohandler: (filename: string, content: string) => void, swagger: SwaggerRepr) {}
 }
 
+
+
+
 /**
  * @interface Options for Swagger class.
  */
@@ -501,6 +506,7 @@ export class Swagger {
   private paths: Map<string, Map<HttpMethod, Path>> = new Map();
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
+  private securityComponent : object;
 
   private command = commandpost
     .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
@@ -542,6 +548,15 @@ export class Swagger {
     }
     this.components.set(name, component);
   }
+
+  /**
+   * 
+   * @param object securitySchemes
+   */
+  addSecurityComponent(object: object) {
+    this.securityComponent = object;
+  }
+
 
   /**
    * Adds `info` section
@@ -597,7 +612,8 @@ export class Swagger {
       {
         paths: pathObject,
         components: {
-          schemas: mapToObj(this.components, r => r.render())
+          schemas: mapToObj(this.components, r => r.render()),
+          securitySchemes: this.securityComponent,
         },
       }
     );
