@@ -2,55 +2,14 @@ import * as devkit from '../src/index';
 import * as yaml from 'js-yaml';
 
 describe('Operation Object', () => {
-  it('should add securitySchemes', () => {
-    const swagger = new devkit.Swagger();
-
-    const securityComponent = {
-      BasicAuth: {
-        type: 'http',
-        scheme: 'basic',
-      },
-      BearerAuth: {
-        type: 'http',
-        scheme: 'bearer'
-      },
-      OAuth2: {
-        type: 'oauth2',
-        flow: {
-          authorizationCode: {
-            authorizationUrl: 'https://example.com/oauth/authorize',
-            tokenUrl: 'https://example.com/oauth/token',
-            scopes: {
-              read: 'Grants read access',
-              write: 'Grants write access',
-              admin: 'Grants access to admin operations',
-            }
-          }
-        }
-      }
-    }
-
-    swagger.addSecurityComponent(securityComponent)
-
-    const expected  = {
-      components: {
-        schemas: {},
-        securitySchemes: securityComponent,
-      },
-    };
-
-    const actual: any = swagger.render();
-    expect(actual).toEqual(expect.objectContaining(expected));
-  });
-
   it('should add securitySchemes class', () => {
     const swagger = new devkit.Swagger();
-    swagger.addSecurityComponent(new devkit.SecuritySchemes()
-      .addBasic('basic')
-      .addBearer()
-      .addApiKey('header', 'X-API-Key')
-      .addOpenID('https://example.com/.well-known/openid-configuration')
-      .addOAuth2({
+    swagger.addSecurityComponent({
+      BasicAuth: devkit.SecurityScheme.basic(),
+      BearerAuth: devkit.SecurityScheme.bearer(),
+      ApiKeyAuth: devkit.SecurityScheme.apiKey('header', 'X-API-Key'),
+      OpenID: devkit.SecurityScheme.openId('https://example.com/.well-known/openid-configuration'),
+      OAuth2: devkit.SecurityScheme.oauth2({
         authorizationCode: {
           authorizationUrl: 'https://example.com/oauth/authorize',
           tokenUrl: 'https://example.com/oauth/token',
@@ -60,12 +19,11 @@ describe('Operation Object', () => {
             admin: 'Grants access to admin operations',
           }
         }
-      })
-    )
-
+      }),
+    });
+    
     const expected = yaml.safeLoad(`
     components:
-      schemas: {}
       securitySchemes:
         BasicAuth:
           type: http

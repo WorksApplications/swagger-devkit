@@ -486,7 +486,7 @@ export interface OAuthFlowObject {
   scopes: object,
 };
 
-export type SecurityScheme = {
+export type SecuritySchemeProps = {
   type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect',
   description?: string,
 } & ({
@@ -501,28 +501,23 @@ export type SecurityScheme = {
   openIdConnectUrl: string,
 });
 
-export class SecuritySchemes {
-  schemes: { [method: string]: SecurityScheme };
+export class SecurityScheme {
+  scheme: SecuritySchemeProps;
 
-  constructor(schemes?: { [method: string]: SecurityScheme }) {
-    this.schemes = schemes || {};
+  constructor(props?: SecuritySchemeProps) {
+    this.scheme = props;
   }
 
-  addSecurityScheme(method: string, scheme: SecurityScheme): SecuritySchemes {
-    this.schemes[method] = scheme;
-    return this;
-  }
-
-  addBasic (scheme: string, overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecuritySchemes {
-    return this.addSecurityScheme('BasicAuth', {
+  static basic (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
+    return new SecurityScheme({
       type: 'http',
-      scheme: scheme,
+      scheme: 'basic',
       ...overrideProps,
     });
   }
 
-  addApiKey (in_: 'query' | 'header' | 'cookie', name: string, overrideProps?: Omit<SecurityScheme, 'type' | 'in' | 'name'>): SecuritySchemes {
-    return this.addSecurityScheme('ApiKeyAuth', {
+  static apiKey (in_: 'query' | 'header' | 'cookie', name: string, overrideProps?: Omit<SecurityScheme, 'type' | 'in' | 'name'>): SecurityScheme {
+    return new SecurityScheme({
       type: 'apiKey',
       in: in_,
       name: name,
@@ -530,24 +525,24 @@ export class SecuritySchemes {
     });
   }
 
-  addBearer (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecuritySchemes {
-    return this.addSecurityScheme('BearerAuth', {
+  static bearer (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
+    return new SecurityScheme({
       type: 'http',
       scheme: 'bearer',
       ...overrideProps,
     });
   }
 
-  addOpenID (openIdConnectUrl: string, overrideProps?: Omit<SecurityScheme, 'type' | 'openIdConnectUrl'>): SecuritySchemes {
-    return this.addSecurityScheme('OpenID', {
+  static openId (openIdConnectUrl: string, overrideProps?: Omit<SecurityScheme, 'type' | 'openIdConnectUrl'>): SecurityScheme {
+    return new SecurityScheme({
       type: 'openIdConnect',
       openIdConnectUrl,
       ...overrideProps,
     });
   }
 
-  addOAuth2 (flows: OAuthFlowsObject, overrideProps?: Omit<SecurityScheme, 'flows'>): SecuritySchemes {
-    return this.addSecurityScheme('OAuth2', {
+  static oauth2 (flows: OAuthFlowsObject, overrideProps?: Omit<SecurityScheme, 'flows'>): SecurityScheme {
+    return new SecurityScheme({
       type: 'oauth2',
       flows,
       ...overrideProps,
@@ -555,7 +550,7 @@ export class SecuritySchemes {
   }
 
   render (): object {
-    return this.schemes;
+    return this.scheme;
   }
 }
 
@@ -591,7 +586,7 @@ export class Swagger {
   private paths: Map<string, Map<HttpMethod, Path>> = new Map();
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
-  private securityComponent : SecuritySchemes | object;
+  private securityComponent : { [name: string]: SecurityScheme | object };
 
   private command = commandpost
     .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
@@ -638,7 +633,7 @@ export class Swagger {
    * 
    * @param object securitySchemes
    */
-  addSecurityComponent(schemes: SecuritySchemes | object) {
+  addSecurityComponent(schemes: { [name: string]: SecurityScheme | object }) {
     this.securityComponent = schemes;
   }
 
@@ -696,10 +691,15 @@ export class Swagger {
       this.object,
       {
         paths: pathObject,
-        components: {
-          schemas: mapToObj(this.components, r => r.render()),
-          securitySchemes: this.securityComponent instanceof SecuritySchemes ? this.securityComponent.render() : this.securityComponent,
-        },
+        components: Object.assign(
+          {},
+          this.components.size > 0 && { schemas: mapToObj(this.components, r => r.render()) },
+          this.securityComponent && { securitySchemes: Object.keys(this.securityComponent).map(key => {
+            const target = this.securityComponent[key];
+            const value = target instanceof SecurityScheme ? target.render() : target;
+            return { [key]: value };
+          }).reduce((prev, current) => Object.assign(prev, current), {}) }
+        ),
       }
     );
   }
