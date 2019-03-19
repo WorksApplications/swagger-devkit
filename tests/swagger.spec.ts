@@ -344,9 +344,9 @@ describe('Swagger', () => {
                   'application/json': {}
                   'application/xml': {}
             security:
-              petstore_auth:
-              - write:pets
-              - read:pets`);
+              - petstore_auth:
+                - write:pets
+                - read:pets`);
 
       swagger.addPath(
         '/pets/{petId}',
@@ -355,12 +355,12 @@ describe('Swagger', () => {
           tags: [ 'pet' ],
           summary: 'Updates a pet in the store with form data',
           operationId: 'updatePetWithForm',
-          security: {
+          security: [{
             petstore_auth: [
               'write:pets',
               'read:pets',
             ]
-          }
+          }]
         })
         .addParameter({
           name: 'petId',
