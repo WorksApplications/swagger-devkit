@@ -472,6 +472,20 @@ export enum HttpMethod {
   TRACE = <any>"trace",
 }
 
+export interface OAuthFlowsObject {
+  implicit?: Pick<OAuthFlowObject, 'authorizationUrl' | 'refreshUrl' | 'scopes'>,
+  password?: Pick<OAuthFlowObject, 'tokenUrl' | 'refreshUrl' | 'scopes'>,
+  clientCredentials?: Pick<OAuthFlowObject, 'tokenUrl' | 'refreshUrl' | 'scopes'>,
+  authorizationCode?: OAuthFlowObject,
+}
+
+export interface OAuthFlowObject {
+  authorizationUrl: string,
+  tokenUrl: string,
+  refreshUrl?: string,
+  scopes: object,
+};
+
 export type SecurityScheme = {
   type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect',
   description?: string,
@@ -482,12 +496,12 @@ export type SecurityScheme = {
   scheme: string,
   bearerFormat?: string,
 } | {
-  flows: any,
+  flows: OAuthFlowsObject,
 } | {
   openIdConnectUrl: string,
 });
 
-class SecuritySchemes {
+export class SecuritySchemes {
   schemes: { [method: string]: SecurityScheme };
 
   constructor(schemes?: { [method: string]: SecurityScheme }) {
@@ -532,12 +546,16 @@ class SecuritySchemes {
     });
   }
 
-  addOAuth2 (flows: any, overrideProps?: Omit<SecurityScheme, 'flows'>): SecuritySchemes {
+  addOAuth2 (flows: OAuthFlowsObject, overrideProps?: Omit<SecurityScheme, 'flows'>): SecuritySchemes {
     return this.addSecurityScheme('OAuth2', {
       type: 'oauth2',
       flows,
       ...overrideProps,
     });
+  }
+
+  render (): object {
+    return this.schemes;
   }
 }
 
@@ -573,7 +591,7 @@ export class Swagger {
   private paths: Map<string, Map<HttpMethod, Path>> = new Map();
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
-  private securityComponent : object;
+  private securityComponent : SecuritySchemes | object;
 
   private command = commandpost
     .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
@@ -620,8 +638,8 @@ export class Swagger {
    * 
    * @param object securitySchemes
    */
-  addSecurityComponent(object: object) {
-    this.securityComponent = object;
+  addSecurityComponent(schemes: SecuritySchemes | object) {
+    this.securityComponent = schemes;
   }
 
 
@@ -680,7 +698,7 @@ export class Swagger {
         paths: pathObject,
         components: {
           schemas: mapToObj(this.components, r => r.render()),
-          securitySchemes: this.securityComponent,
+          securitySchemes: this.securityComponent instanceof SecuritySchemes ? this.securityComponent.render() : this.securityComponent,
         },
       }
     );

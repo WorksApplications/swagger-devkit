@@ -30,7 +30,6 @@ describe('Operation Object', () => {
       }
     }
 
-
     swagger.addSecurityComponent(securityComponent)
 
     const expected  = {
@@ -40,7 +39,57 @@ describe('Operation Object', () => {
       },
     };
 
+    const actual: any = swagger.render();
+    expect(actual).toEqual(expect.objectContaining(expected));
+  });
 
+  it('should add securitySchemes class', () => {
+    const swagger = new devkit.Swagger();
+    swagger.addSecurityComponent(new devkit.SecuritySchemes()
+      .addBasic('basic')
+      .addBearer()
+      .addApiKey('header', 'X-API-Key')
+      .addOpenID('https://example.com/.well-known/openid-configuration')
+      .addOAuth2({
+        authorizationCode: {
+          authorizationUrl: 'https://example.com/oauth/authorize',
+          tokenUrl: 'https://example.com/oauth/token',
+          scopes: {
+            read: 'Grants read access',
+            write: 'Grants write access',
+            admin: 'Grants access to admin operations',
+          }
+        }
+      })
+    )
+
+    const expected = yaml.safeLoad(`
+    components:
+      schemas: {}
+      securitySchemes:
+        BasicAuth:
+          type: http
+          scheme: basic
+        BearerAuth:
+          type: http
+          scheme: bearer
+        ApiKeyAuth:
+          type: apiKey
+          in: header
+          name: X-API-Key
+        OpenID:
+          type: openIdConnect
+          openIdConnectUrl: https://example.com/.well-known/openid-configuration
+        OAuth2:
+          type: oauth2
+          flows:
+            authorizationCode:
+              authorizationUrl: https://example.com/oauth/authorize
+              tokenUrl: https://example.com/oauth/token
+              scopes:
+                read: Grants read access
+                write: Grants write access
+                admin: Grants access to admin operations`);
 
     const actual: any = swagger.render();
     expect(actual).toEqual(expect.objectContaining(expected));
