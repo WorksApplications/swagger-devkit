@@ -1,6 +1,6 @@
 {
   "name": "swagger-devkit",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "swagger development kit",
   "dependencies": {
     "@types/express": "^4.16.0",
