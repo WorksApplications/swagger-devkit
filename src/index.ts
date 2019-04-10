@@ -338,7 +338,7 @@ export interface PathProps {
   parameters?: Array<ParameterProps>,
 }
 
-export class Path {
+export class Path<method = any> {
   private props: PathProps;
   private parameters: Array<ParameterProps> = [];
   responses: Map<string, Response> = new Map();
@@ -348,12 +348,12 @@ export class Path {
     this.props = props;
   }
 
-  addParameter (props: ParameterProps): Path {
+  addParameter (props: ParameterProps): Path<method> {
     this.parameters.push(props);
     return this;
   }
 
-  addResponse (statusCode: string, object: Response | ResponseProps): Path {
+  addResponse (statusCode: string, object: Response | ResponseProps): Path<method> {
     if (object instanceof Response) {
       this.responses.set(statusCode, object);
     } else {
@@ -363,7 +363,7 @@ export class Path {
     return this;
   }
 
-  addResponses (responses: Array<{ statusCode: string, response: Response | ResponseProps }>): Path {
+  addResponses (responses: Array<{ statusCode: string, response: Response | ResponseProps }>): Path<method> {
     return responses.reduce(
       (that, value) => {
         return that.addResponse(value.statusCode, value.response);
@@ -372,7 +372,7 @@ export class Path {
     )
   }
 
-  addRequestBody (requestBody: RequestBody): Path {
+  addRequestBody (requestBody: RequestBody): Path<"request_body"> {
     this.requestBody = requestBody;
     return this;
   }
@@ -461,16 +461,18 @@ export interface ServerProps {
   variables?: { [key: string]: ServerVariableProps }
 }
 
-export enum HttpMethod {
-  GET = <any>"get",
-  PUT = <any>"put",
-  POST = <any>"post",
-  DELETE = <any>"delete",
-  OPTIONS = <any>"options",
-  HEAD = <any>"head",
-  PATCH = <any>"patch",
-  TRACE = <any>"trace",
-}
+const literal = <V extends keyof any>(v: V) => v;
+export const HttpMethod = {
+  GET: literal('get'),
+  PUT: literal('put'),
+  POST: literal('post'),
+  DELETE: literal('delete'),
+  OPTIONS: literal('options'),
+  HEAD: literal('head'),
+  PATCH: literal('patch'),
+  TRACE: literal('trace'),
+};
+export type HttpMethod = (typeof HttpMethod)[keyof typeof HttpMethod];
 
 export interface OAuthFlowsObject {
   implicit?: Pick<OAuthFlowObject, 'authorizationUrl' | 'refreshUrl' | 'scopes'>,
@@ -555,7 +557,7 @@ export class SecurityScheme {
 }
 
 export interface SwaggerRepr {
-  paths: Map<string, Map<HttpMethod, Path>>,
+  paths: Map<string, Map<HttpMethod, Path<any>>>,
   components: Map<string, Component>,
 }
 
@@ -583,7 +585,7 @@ export interface SwaggerOptions {
 export class Swagger {
   private outfile: string = 'openapi.yml';
   private object: any = {};
-  private paths: Map<string, Map<HttpMethod, Path>> = new Map();
+  private paths: Map<string, Map<HttpMethod, Path<any>>> = new Map();
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
   private securityComponent : { [name: string]: SecurityScheme | object };
@@ -659,7 +661,7 @@ export class Swagger {
    * @param object The path object
    * @param pluginOptions List options with each external plugin name
    */
-  addPath(path: string, method: HttpMethod, object: Path, pluginOptions?: { [pluginName: string]: object }) {
+  addPath<method>(path: string, method: method extends "request_body" ? "put" | "post" | "delete" | "patch" : HttpMethod, object: Path<method>, pluginOptions?: { [pluginName: string]: object }) {
     if (!this.paths.has(path)) {
       this.paths.set(path, new Map());
     }

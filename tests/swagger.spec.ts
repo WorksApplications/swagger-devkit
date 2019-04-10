@@ -298,6 +298,23 @@ describe('Swagger', () => {
   
       expect(actual).toEqual(expect.objectContaining(expected));
     });
+
+    /*
+    This raises a type error!
+
+    it('should throw an exception when GET request has a body', () => {
+      const swagger = new devkit.Swagger();
+
+      expect(
+        swagger.addPath(
+          '/',
+          devkit.HttpMethod.GET,
+          new devkit.Path({})
+          .addRequestBody(new devkit.RequestBody())
+        )
+      ).toThrow(TypeError);
+    })
+    */
   });
 
   describe('Operation Object', () => {
