@@ -1,0 +1,13 @@
+pets:
+  events:
+    - http:
+        path: /pets
+        method: get
+    - http:
+        path: /pets
+        method: post
+        cors: true
+    - http:
+        path: '/pets/{petId}'
+        method: get
+        cors: true

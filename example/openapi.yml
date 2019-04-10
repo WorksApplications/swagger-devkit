@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pet'
+                $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           content:
@@ -101,6 +101,10 @@ components:
           type: string
         tag:
           type: string
+      example:
+        id: 100
+        name: foo
+        tag: bar
     Pets:
       type: array
       items:

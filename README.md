@@ -8,3 +8,9 @@ Write a swagger document with TypeScript/Node.js.
 - Well-typed library with completions
 - Declarative style, inspired by [aws-cdk](https://github.com/awslabs/aws-cdk)
 - Extend with custom plugins
+
+## Example
+
+- [petstore example](./example/index.js)
+
+Run: `node index.js` or `node index.js --help`
