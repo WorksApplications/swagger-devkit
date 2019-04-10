@@ -1,5 +1,7 @@
 # swagger-devkit
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/WorksApplications/swagger-devkit.svg)](https://greenkeeper.io/)
+
 Write a swagger document with TypeScript/Node.js.
 
 ## Features
