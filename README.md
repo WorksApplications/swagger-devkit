@@ -1,8 +1,10 @@
 # swagger-devkit
 
-Get the package from https://s3.amazonaws.com/misc-tooling/swagger-devkit/swagger-devkit-X.Y.Z.tgz
+Write a swagger document with TypeScript/Node.js.
 
-## Docs
+## Features
 
-https://s3.amazonaws.com/misc-tooling/swagger-devkit/docs/index.html
-
+- Supports OpenAPI 3 (not completed yet)
+- Well-typed library with completions
+- Declarative style, inspired by [aws-cdk](https://github.com/awslabs/aws-cdk)
+- Extend with custom plugins
