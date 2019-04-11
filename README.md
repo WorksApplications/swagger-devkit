@@ -1,6 +1,6 @@
 # swagger-devkit
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/WorksApplications/swagger-devkit.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/WorksApplications/swagger-devkit.svg)](https://greenkeeper.io/) [![npm version](https://badge.fury.io/js/swagger-devkit.svg)](https://badge.fury.io/js/swagger-devkit) [![CircleCI](https://circleci.com/gh/WorksApplications/swagger-devkit.svg?style=svg)](https://circleci.com/gh/WorksApplications/swagger-devkit)
 
 Write a swagger document with TypeScript/Node.js.
 
