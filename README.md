@@ -13,6 +13,6 @@ Write a swagger document with TypeScript/Node.js.
 
 ## Example
 
-- [petstore example](./example/index.js)
+- [petstore example](https://github.com/WorksApplications/swagger-devkit/blob/master/example/index.js)
 
 Run: `node index.js` or `node index.js --help`
