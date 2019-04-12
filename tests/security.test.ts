@@ -1,27 +1,29 @@
-import * as devkit from '../src/index';
-import * as yaml from 'js-yaml';
+import * as devkit from "../src/index";
+import * as yaml from "js-yaml";
 
-describe('Operation Object', () => {
-  it('should add securitySchemes class', () => {
+describe("Operation Object", () => {
+  it("should add securitySchemes class", () => {
     const swagger = new devkit.Swagger();
     swagger.addSecurityComponent({
       BasicAuth: devkit.SecurityScheme.basic(),
       BearerAuth: devkit.SecurityScheme.bearer(),
-      ApiKeyAuth: devkit.SecurityScheme.apiKey('header', 'X-API-Key'),
-      OpenID: devkit.SecurityScheme.openId('https://example.com/.well-known/openid-configuration'),
+      ApiKeyAuth: devkit.SecurityScheme.apiKey("header", "X-API-Key"),
+      OpenID: devkit.SecurityScheme.openId(
+        "https://example.com/.well-known/openid-configuration"
+      ),
       OAuth2: devkit.SecurityScheme.oauth2({
         authorizationCode: {
-          authorizationUrl: 'https://example.com/oauth/authorize',
-          tokenUrl: 'https://example.com/oauth/token',
+          authorizationUrl: "https://example.com/oauth/authorize",
+          tokenUrl: "https://example.com/oauth/token",
           scopes: {
-            read: 'Grants read access',
-            write: 'Grants write access',
-            admin: 'Grants access to admin operations',
+            read: "Grants read access",
+            write: "Grants write access",
+            admin: "Grants access to admin operations"
           }
         }
-      }),
+      })
     });
-    
+
     const expected = yaml.safeLoad(`
     components:
       securitySchemes:
@@ -53,13 +55,12 @@ describe('Operation Object', () => {
     expect(actual).toEqual(expect.objectContaining(expected));
   });
 
-
-  it('should add security', () => {
+  it("should add security", () => {
     const swagger = new devkit.Swagger();
 
     const security = [
       { Auth: [] as Array<string> },
-      { OAuth2: ['read', 'write']},
+      { OAuth2: ["read", "write"] }
     ];
 
     const expected = yaml.safeLoad(`
@@ -72,18 +73,17 @@ describe('Operation Object', () => {
               - OAuth2: [read, write]
       `);
 
-    
-
     swagger.addPath(
-      '/pets',
+      "/pets",
       devkit.HttpMethod.GET,
       new devkit.Path({
-        description: 'Returns all pets from the system that the user has access to',
-        security: security,
+        description:
+          "Returns all pets from the system that the user has access to",
+        security: security
       })
     );
     const actual: any = swagger.render();
-    
+
     expect(actual).toEqual(expect.objectContaining(expected));
   });
 });

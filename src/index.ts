@@ -1,19 +1,22 @@
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
-import * as commandpost from 'commandpost';
-import * as express from 'express';
+import * as fs from "fs";
+import * as yaml from "js-yaml";
+import * as commandpost from "commandpost";
+import * as express from "express";
 
 /**
  * @private
  */
-function mapToObj<T>(arg: Map<string, T>, func: (arg0: T) => object = (x : any) => x): object {
+function mapToObj<T>(
+  arg: Map<string, T>,
+  func: (arg0: T) => object = (x: any) => x
+): object {
   const obj: any = {};
   arg.forEach((value, key) => {
     obj[key] = func(value);
   });
 
   return obj;
-};
+}
 
 export type SchemaInput = SchemaProps | Ref;
 
@@ -23,7 +26,7 @@ export enum SchemaType {
   STRING = <any>"string",
   BOOLEAN = <any>"boolean",
   OBJECT = <any>"object",
-  ARRAY = <any>"array",
+  ARRAY = <any>"array"
 }
 
 export enum SchemaFormat {
@@ -35,43 +38,43 @@ export enum SchemaFormat {
   BINARY = <any>"binary",
   DATE = <any>"date",
   DATETIME = <any>"datetime",
-  PASSWORD = <any>"password",
+  PASSWORD = <any>"password"
 }
 
 // The recursive element SchemaInput should be abstracted as type parameter
 // and is instantiated into Schema class properly?
 export interface SchemaProps {
-  type?: SchemaType | string,
-  required?: Array<string>,
+  type?: SchemaType | string;
+  required?: Array<string>;
   properties?: {
-    [key: string]: SchemaInput,
-  },
-  style?: string,
-  items?: SchemaInput,
-  format?: SchemaFormat | string,
-  example?: any,
-  enum?: Array<string>,
-  description?: string,
+    [key: string]: SchemaInput;
+  };
+  style?: string;
+  items?: SchemaInput;
+  format?: SchemaFormat | string;
+  example?: any;
+  enum?: Array<string>;
+  description?: string;
 
-  oneOf?: Array<SchemaInput>,
-  allOf?: Array<SchemaInput>,
-  anyOf?: Array<SchemaInput>,
-  not?: SchemaInput,
-  additionalProperties?: boolean,
-  default?: any,
+  oneOf?: Array<SchemaInput>;
+  allOf?: Array<SchemaInput>;
+  anyOf?: Array<SchemaInput>;
+  not?: SchemaInput;
+  additionalProperties?: boolean;
+  default?: any;
 }
 
 /**
  * @class Schema class
  */
 export class Schema {
-  private props: { "$ref": string } | SchemaProps;
+  private props: { $ref: string } | SchemaProps;
   private refObject: Ref;
   private is_ref: boolean;
 
-  constructor (props: SchemaInput) {
+  constructor(props: SchemaInput) {
     if (props instanceof Ref) {
-      this.props = { "$ref": props.ref };
+      this.props = { $ref: props.ref };
       this.refObject = props;
       this.is_ref = true;
     } else {
@@ -80,101 +83,107 @@ export class Schema {
     }
   }
 
-  static int32 (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static int32(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.INTEGER,
       format: SchemaFormat.INT32,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static int64 (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static int64(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.INTEGER,
       format: SchemaFormat.INT64,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static float (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static float(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.NUMBER,
       format: SchemaFormat.FLOAT,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static double (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static double(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.NUMBER,
       format: SchemaFormat.DOUBLE,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static string (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static string(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.STRING,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static byte (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static byte(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.STRING,
       format: SchemaFormat.BINARY,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static boolean (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static boolean(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.BOOLEAN,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static date (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static date(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.STRING,
       format: SchemaFormat.DATE,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static datetime (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static datetime(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.STRING,
       format: SchemaFormat.DATETIME,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static password (overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static password(overrideProps?: Partial<SchemaProps>): SchemaProps {
     return {
       type: SchemaType.STRING,
       format: SchemaFormat.PASSWORD,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static array (items: SchemaInput, overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static array(
+    items: SchemaInput,
+    overrideProps?: Partial<SchemaProps>
+  ): SchemaProps {
     return {
       type: SchemaType.ARRAY,
       items,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  static object (properties: { [key: string]: SchemaProps }, overrideProps?: Partial<SchemaProps>): SchemaProps {
+  static object(
+    properties: { [key: string]: SchemaProps },
+    overrideProps?: Partial<SchemaProps>
+  ): SchemaProps {
     return {
       type: SchemaType.OBJECT,
       properties,
-      ...overrideProps,
+      ...overrideProps
     };
   }
 
-  example (): any {
+  example(): any {
     if ((this.props as any).example) {
       return (this.props as any).example;
     } else if (this.is_ref) {
@@ -189,14 +198,20 @@ export class Schema {
       } else if (props.type === SchemaType.STRING) {
         return "";
       } else if (props.type === SchemaType.ARRAY) {
-        return [ new Schema(props.items).example() ];
+        return [new Schema(props.items).example()];
       } else {
-        return Object.keys(props.properties).reduce((prev, current) => Object.assign(prev, { [current]: new Schema(props.properties[current]).example() }), {})
+        return Object.keys(props.properties).reduce(
+          (prev, current) =>
+            Object.assign(prev, {
+              [current]: new Schema(props.properties[current]).example()
+            }),
+          {}
+        );
       }
     }
   }
 
-  render (): object {
+  render(): object {
     if (this.is_ref) {
       return this.props;
     } else {
@@ -205,12 +220,25 @@ export class Schema {
       return Object.assign(
         object,
         object.items && { items: new Schema(object.items).render() },
-        object.properties && { properties: Object.keys(object.properties)
-          .reduce((prev, current) => Object.assign(prev, { [current]: new Schema(object.properties[current]).render() }), {}) },
-        object.oneOf && { oneOf: object.oneOf.map(schema => new Schema(schema).render()) },
-        object.anyOf && { anyOf: object.anyOf.map(schema => new Schema(schema).render()) },
-        object.allOf && { allOf: object.allOf.map(schema => new Schema(schema).render()) },
-        object.not && { not: new Schema(object.not).render() },
+        object.properties && {
+          properties: Object.keys(object.properties).reduce(
+            (prev, current) =>
+              Object.assign(prev, {
+                [current]: new Schema(object.properties[current]).render()
+              }),
+            {}
+          )
+        },
+        object.oneOf && {
+          oneOf: object.oneOf.map(schema => new Schema(schema).render())
+        },
+        object.anyOf && {
+          anyOf: object.anyOf.map(schema => new Schema(schema).render())
+        },
+        object.allOf && {
+          allOf: object.allOf.map(schema => new Schema(schema).render())
+        },
+        object.not && { not: new Schema(object.not).render() }
       );
     }
   }
@@ -218,7 +246,7 @@ export class Schema {
 
 // Be careful! This SchemaInput is not converted to Schema in Header object in Response
 export interface ResponseProps {
-  description: string,
+  description: string;
 }
 
 /** @private */
@@ -228,18 +256,18 @@ type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 type HeaderProps = Omit<ParameterProps, "name" | "in">;
 
 export interface EncodingProps {
-  contentType?: string,
-  headers?: { [key: string]: HeaderProps },
-  style?: string,
-  explode?: boolean,
-  allowReserved?: boolean,
+  contentType?: string;
+  headers?: { [key: string]: HeaderProps };
+  style?: string;
+  explode?: boolean;
+  allowReserved?: boolean;
 }
 
 export interface MediaTypeObject {
-  schema?: SchemaInput,
-  example?: any,
-  examples?: { [key: string]: any },
-  encoding?: { [key: string]: EncodingProps },
+  schema?: SchemaInput;
+  example?: any;
+  examples?: { [key: string]: any };
+  encoding?: { [key: string]: EncodingProps };
 }
 
 export class Response {
@@ -247,26 +275,34 @@ export class Response {
   private headers: Map<string, HeaderProps> = new Map();
   content: Map<string, Schema> = new Map();
 
-  constructor (props: ResponseProps) {
+  constructor(props: ResponseProps) {
     this.props = props;
   }
 
-  addHeader (header: string, props: HeaderProps): Response {
+  addHeader(header: string, props: HeaderProps): Response {
     this.headers.set(header, props);
     return this;
   }
 
-  addContent (contentType: string, schema: SchemaInput): Response {
+  addContent(contentType: string, schema: SchemaInput): Response {
     this.content.set(contentType, new Schema(schema));
     return this;
   }
 
-  render (): object {
+  render(): object {
     return Object.assign(
       this.props,
-      this.headers.size !== 0 && { headers: mapToObj(this.headers, h => Object.assign(h, { schema: new Schema(h.schema).render() })) },
-      this.content.size !== 0 && { content: mapToObj(this.content, r => (Object.keys(r.render()).length > 0 ? { schema: r.render() } : {})) },
-    )
+      this.headers.size !== 0 && {
+        headers: mapToObj(this.headers, h =>
+          Object.assign(h, { schema: new Schema(h.schema).render() })
+        )
+      },
+      this.content.size !== 0 && {
+        content: mapToObj(this.content, r =>
+          Object.keys(r.render()).length > 0 ? { schema: r.render() } : {}
+        )
+      }
+    );
   }
 }
 
@@ -274,7 +310,7 @@ export enum ParameterLocation {
   PATH = <any>"path",
   HEADER = <any>"header",
   QUERY = <any>"query",
-  COOKIE = <any>"cookie",
+  COOKIE = <any>"cookie"
 }
 
 export enum ParameterStyle {
@@ -284,58 +320,60 @@ export enum ParameterStyle {
   SIMPLE = <any>"simple",
   SPACEDELIMITED = <any>"spaceDelimited",
   PIPEDELIMITED = <any>"pipeDelimited",
-  deepObject = <any>"deepObject",
+  deepObject = <any>"deepObject"
 }
 
 export interface ParameterProps {
-  name: string,
-  in: ParameterLocation | string,
-  description?: string,
-  required?: boolean,
-  deprecated?: boolean,
-  allowEmptyValue?: boolean,
+  name: string;
+  in: ParameterLocation | string;
+  description?: string;
+  required?: boolean;
+  deprecated?: boolean;
+  allowEmptyValue?: boolean;
 
-  style?: ParameterStyle | string,
-  explode?: boolean,
-  allowReserved?: boolean,
-  schema?: SchemaInput,
-  example?: any,
-  examples?: { [key: string]: any },
+  style?: ParameterStyle | string;
+  explode?: boolean;
+  allowReserved?: boolean;
+  schema?: SchemaInput;
+  example?: any;
+  examples?: { [key: string]: any };
 }
 
 export interface RequestBodyProps {
-  description?: string,
-  required?: boolean,
+  description?: string;
+  required?: boolean;
 }
 
 export class RequestBody {
   private props: RequestBodyProps;
   private content: Map<string, Schema> = new Map();
 
-  constructor (props: RequestBodyProps = {}) {
+  constructor(props: RequestBodyProps = {}) {
     this.props = props;
   }
 
-  addContent (contentType: string, schema: SchemaInput): RequestBody {
+  addContent(contentType: string, schema: SchemaInput): RequestBody {
     this.content.set(contentType, new Schema(schema));
     return this;
   }
 
-  render (): object {
+  render(): object {
     return Object.assign(
       this.props,
-      this.content.size !== 0 && { content: mapToObj(this.content, r => ({ schema: r.render() })) },
-    )
+      this.content.size !== 0 && {
+        content: mapToObj(this.content, r => ({ schema: r.render() }))
+      }
+    );
   }
 }
 
 export interface PathProps {
-  summary?: string,
-  operationId?: string,
-  tags?: Array<string>,
-  description?: string,
-  security?: Array<{[key: string]: Array<string>}>,
-  parameters?: Array<ParameterProps>,
+  summary?: string;
+  operationId?: string;
+  tags?: Array<string>;
+  description?: string;
+  security?: Array<{ [key: string]: Array<string> }>;
+  parameters?: Array<ParameterProps>;
 }
 
 export class Path<method = any> {
@@ -344,16 +382,19 @@ export class Path<method = any> {
   responses: Map<string, Response> = new Map();
   private requestBody: RequestBody;
 
-  constructor (props: PathProps) {
+  constructor(props: PathProps) {
     this.props = props;
   }
 
-  addParameter (props: ParameterProps): Path<method> {
+  addParameter(props: ParameterProps): Path<method> {
     this.parameters.push(props);
     return this;
   }
 
-  addResponse (statusCode: string, object: Response | ResponseProps): Path<method> {
+  addResponse(
+    statusCode: string,
+    object: Response | ResponseProps
+  ): Path<method> {
     if (object instanceof Response) {
       this.responses.set(statusCode, object);
     } else {
@@ -363,26 +404,27 @@ export class Path<method = any> {
     return this;
   }
 
-  addResponses (responses: Array<{ statusCode: string, response: Response | ResponseProps }>): Path<method> {
-    return responses.reduce(
-      (that, value) => {
-        return that.addResponse(value.statusCode, value.response);
-      },
-      this,
-    )
+  addResponses(
+    responses: Array<{ statusCode: string; response: Response | ResponseProps }>
+  ): Path<method> {
+    return responses.reduce((that, value) => {
+      return that.addResponse(value.statusCode, value.response);
+    }, this);
   }
 
-  addRequestBody (requestBody: RequestBody): Path<"request_body"> {
+  addRequestBody(requestBody: RequestBody): Path<"request_body"> {
     this.requestBody = requestBody;
     return this;
   }
 
-  render (): object {
+  render(): object {
     return Object.assign(
       this.props,
       this.requestBody && { requestBody: this.requestBody.render() },
       this.parameters.length != 0 && { parameters: this.parameters },
-      this.responses.size != 0 && { responses: mapToObj(this.responses, r => r.render()) },
+      this.responses.size != 0 && {
+        responses: mapToObj(this.responses, r => r.render())
+      }
     );
   }
 }
@@ -394,16 +436,14 @@ export class Ref {
   /** e.g.) `#/components/schemas/name` */
   ref: string;
 
-  constructor (ref: string) {
+  constructor(ref: string) {
     this.ref = ref;
   }
 
-  example (): any {
-    throw new Error('not implemented yet');
+  example(): any {
+    throw new Error("not implemented yet");
   }
 }
-
-
 
 /**
  * @class Instantiating this class adds the component immediately.
@@ -412,96 +452,106 @@ export class Component extends Ref {
   private schema: Schema;
 
   /**
-   * 
+   *
    * @param parent Swagger instance to which the component to be added
    * @param name Name of the component, should be unique in a swagger object
    * @param schema Schema of the component
    */
-  constructor (parent: Swagger, name: string, schema: SchemaInput) {
+  constructor(parent: Swagger, name: string, schema: SchemaInput) {
     super(`#/components/schemas/${name}`);
 
     parent.addComponent(name, this);
     this.schema = new Schema(schema);
   }
 
-  render (): object {
+  render(): object {
     return this.schema.render();
   }
 
-  example (): any {
+  example(): any {
     return this.schema.example();
   }
 }
 
 export interface InfoProps {
-  title: string,
-  description?: string,
-  termsOfService?: string,
+  title: string;
+  description?: string;
+  termsOfService?: string;
   contact?: {
-    name?: string,
-    url: string,
-    email: string,
-  },
+    name?: string;
+    url: string;
+    email: string;
+  };
   license?: {
-    name: string,
-    url?: string
-  },
-  version: string,
+    name: string;
+    url?: string;
+  };
+  version: string;
 }
 
 export interface ServerVariableProps {
-  enum?: Array<string>,
-  default: string,
-  description?: string,
+  enum?: Array<string>;
+  default: string;
+  description?: string;
 }
 
 export interface ServerProps {
-  url: string,
-  description?: string,
-  variables?: { [key: string]: ServerVariableProps }
+  url: string;
+  description?: string;
+  variables?: { [key: string]: ServerVariableProps };
 }
 
 const literal = <V extends keyof any>(v: V) => v;
 export const HttpMethod = {
-  GET: literal('get'),
-  PUT: literal('put'),
-  POST: literal('post'),
-  DELETE: literal('delete'),
-  OPTIONS: literal('options'),
-  HEAD: literal('head'),
-  PATCH: literal('patch'),
-  TRACE: literal('trace'),
+  GET: literal("get"),
+  PUT: literal("put"),
+  POST: literal("post"),
+  DELETE: literal("delete"),
+  OPTIONS: literal("options"),
+  HEAD: literal("head"),
+  PATCH: literal("patch"),
+  TRACE: literal("trace")
 };
 export type HttpMethod = (typeof HttpMethod)[keyof typeof HttpMethod];
 
 export interface OAuthFlowsObject {
-  implicit?: Pick<OAuthFlowObject, 'authorizationUrl' | 'refreshUrl' | 'scopes'>,
-  password?: Pick<OAuthFlowObject, 'tokenUrl' | 'refreshUrl' | 'scopes'>,
-  clientCredentials?: Pick<OAuthFlowObject, 'tokenUrl' | 'refreshUrl' | 'scopes'>,
-  authorizationCode?: OAuthFlowObject,
+  implicit?: Pick<
+    OAuthFlowObject,
+    "authorizationUrl" | "refreshUrl" | "scopes"
+  >;
+  password?: Pick<OAuthFlowObject, "tokenUrl" | "refreshUrl" | "scopes">;
+  clientCredentials?: Pick<
+    OAuthFlowObject,
+    "tokenUrl" | "refreshUrl" | "scopes"
+  >;
+  authorizationCode?: OAuthFlowObject;
 }
 
 export interface OAuthFlowObject {
-  authorizationUrl: string,
-  tokenUrl: string,
-  refreshUrl?: string,
-  scopes: object,
-};
+  authorizationUrl: string;
+  tokenUrl: string;
+  refreshUrl?: string;
+  scopes: object;
+}
 
 export type SecuritySchemeProps = {
-  type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect',
-  description?: string,
-} & ({
-  name: string,
-  in: 'query' | 'header' | 'cookie',
-} | {
-  scheme: string,
-  bearerFormat?: string,
-} | {
-  flows: OAuthFlowsObject,
-} | {
-  openIdConnectUrl: string,
-});
+  type: "apiKey" | "http" | "oauth2" | "openIdConnect";
+  description?: string;
+} & (
+  | {
+      name: string;
+      in: "query" | "header" | "cookie";
+    }
+  | {
+      scheme: string;
+      bearerFormat?: string;
+    }
+  | {
+      flows: OAuthFlowsObject;
+    }
+  | {
+      openIdConnectUrl: string;
+    });
 
 export class SecurityScheme {
   scheme: SecuritySchemeProps;
@@ -510,103 +560,122 @@ export class SecurityScheme {
     this.scheme = props;
   }
 
-  static basic (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
+  static basic(
+    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+  ): SecurityScheme {
     return new SecurityScheme({
-      type: 'http',
-      scheme: 'basic',
-      ...overrideProps,
+      type: "http",
+      scheme: "basic",
+      ...overrideProps
     });
   }
 
-  static apiKey (in_: 'query' | 'header' | 'cookie', name: string, overrideProps?: Omit<SecurityScheme, 'type' | 'in' | 'name'>): SecurityScheme {
+  static apiKey(
+    in_: "query" | "header" | "cookie",
+    name: string,
+    overrideProps?: Omit<SecurityScheme, "type" | "in" | "name">
+  ): SecurityScheme {
     return new SecurityScheme({
-      type: 'apiKey',
+      type: "apiKey",
       in: in_,
       name: name,
-      ...overrideProps,
+      ...overrideProps
     });
   }
 
-  static bearer (overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
+  static bearer(
+    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+  ): SecurityScheme {
     return new SecurityScheme({
-      type: 'http',
-      scheme: 'bearer',
-      ...overrideProps,
+      type: "http",
+      scheme: "bearer",
+      ...overrideProps
     });
   }
 
-  static openId (openIdConnectUrl: string, overrideProps?: Omit<SecurityScheme, 'type' | 'openIdConnectUrl'>): SecurityScheme {
+  static openId(
+    openIdConnectUrl: string,
+    overrideProps?: Omit<SecurityScheme, "type" | "openIdConnectUrl">
+  ): SecurityScheme {
     return new SecurityScheme({
-      type: 'openIdConnect',
+      type: "openIdConnect",
       openIdConnectUrl,
-      ...overrideProps,
+      ...overrideProps
     });
   }
 
-  static oauth2 (flows: OAuthFlowsObject, overrideProps?: Omit<SecurityScheme, 'flows'>): SecurityScheme {
+  static oauth2(
+    flows: OAuthFlowsObject,
+    overrideProps?: Omit<SecurityScheme, "flows">
+  ): SecurityScheme {
     return new SecurityScheme({
-      type: 'oauth2',
+      type: "oauth2",
       flows,
-      ...overrideProps,
+      ...overrideProps
     });
   }
 
-  render (): object {
+  render(): object {
     return this.scheme;
   }
 }
 
 export interface SwaggerRepr {
-  paths: Map<string, Map<HttpMethod, Path<any>>>,
-  components: Map<string, Component>,
+  paths: Map<string, Map<HttpMethod, Path<any>>>;
+  components: Map<string, Component>;
 }
 
 export class Plugin {
-  addPathOptions (path: string, method: HttpMethod, options: object) {}
-  run (iohandler: (filename: string, content: string) => void, swagger: SwaggerRepr) {}
+  addPathOptions(path: string, method: HttpMethod, options: object) {}
+  run(
+    iohandler: (filename: string, content: string) => void,
+    swagger: SwaggerRepr
+  ) {}
 }
-
 
 /**
  * @interface Options for Swagger class.
  */
 export interface SwaggerOptions {
   /** Version of OpenAPI (default is `3.0.0` and only OpenAPI3 is supported) */
-  openapi?: string,
+  openapi?: string;
   /** Specifies the filename for output */
-  outfile?: string,
+  outfile?: string;
   /** Install external plugins */
-  plugins?: { [pluginName: string]: Plugin },
+  plugins?: { [pluginName: string]: Plugin };
 }
 
 /**
  * @class The core class of swagger-devkit. See `SwaggerOptions` for constructor options.
  */
 export class Swagger {
-  private outfile: string = 'openapi.yml';
+  private outfile: string = "openapi.yml";
   private object: any = {};
   private paths: Map<string, Map<HttpMethod, Path<any>>> = new Map();
   private components: Map<string, Component> = new Map();
   private plugins: { [pluginName: string]: Plugin } = {};
-  private securityComponent : { [name: string]: SecurityScheme | object };
+  private securityComponent: { [name: string]: SecurityScheme | object };
 
   private command = commandpost
-    .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
-    .version(require('../package.json').version, '-v, --version')
-    .option('-s, --mock-server', 'Start the mock server')
-    .option('--dry-run', 'Dry-run; not actually run the command but show the result')
+    .create<{ mockServer: boolean; dryRun: boolean }, {}>("swagger-devkit")
+    .version(require("../package.json").version, "-v, --version")
+    .option("-s, --mock-server", "Start the mock server")
+    .option(
+      "--dry-run",
+      "Dry-run; not actually run the command but show the result"
+    )
     .action((opts, args) => {
       this.evaluate(opts);
     });
 
-  constructor (options?: SwaggerOptions) {
+  constructor(options?: SwaggerOptions) {
     if (options && options.openapi) {
-      this.addObject('openapi', options.openapi);
+      this.addObject("openapi", options.openapi);
     } else {
-      this.addObject('openapi', '3.0.0');
+      this.addObject("openapi", "3.0.0");
     }
 
-    this.addObject('paths', {});
+    this.addObject("paths", {});
 
     if (options && options.plugins) {
       this.plugins = options.plugins;
@@ -617,7 +686,7 @@ export class Swagger {
     }
   }
 
-  private addObject (key: string, value: any) {
+  private addObject(key: string, value: any) {
     this.object[key] = value;
   }
 
@@ -626,32 +695,33 @@ export class Swagger {
    */
   addComponent(name: string, component: Component) {
     if (this.components.get(name) !== undefined) {
-      throw new Error(`DuplicateComponentKeyException: ${name} is already defined`);
+      throw new Error(
+        `DuplicateComponentKeyException: ${name} is already defined`
+      );
     }
     this.components.set(name, component);
   }
 
   /**
-   * 
+   *
    * @param object securitySchemes
    */
   addSecurityComponent(schemes: { [name: string]: SecurityScheme | object }) {
     this.securityComponent = schemes;
   }
 
-
   /**
    * Adds `info` section
    */
   addInfo(props: InfoProps) {
-    this.addObject('info', props);
+    this.addObject("info", props);
   }
 
   /**
    * Adds `servers` section
    */
   addServers(props: Array<ServerProps>) {
-    this.addObject('servers', props);
+    this.addObject("servers", props);
   }
 
   /**
@@ -661,15 +731,22 @@ export class Swagger {
    * @param object The path object
    * @param pluginOptions List options with each external plugin name
    */
-  addPath<method>(path: string, method: method extends "request_body" ? "put" | "post" | "delete" | "patch" : HttpMethod, object: Path<method>, pluginOptions?: { [pluginName: string]: object }) {
+  addPath<method>(
+    path: string,
+    method: method extends "request_body"
+      ? "put" | "post" | "delete" | "patch"
+      : HttpMethod,
+    object: Path<method>,
+    pluginOptions?: { [pluginName: string]: object }
+  ) {
     if (!this.paths.has(path)) {
       this.paths.set(path, new Map());
     }
 
     this.paths.get(path).set(method, object);
-    
+
     if (pluginOptions) {
-      Object.keys(pluginOptions).forEach((name) => {
+      Object.keys(pluginOptions).forEach(name => {
         this.plugins[name].addPathOptions(path, method, pluginOptions[name]);
       });
     }
@@ -678,7 +755,7 @@ export class Swagger {
   /**
    * Generates an object that represents the swagger structure
    */
-  render (): object {
+  render(): object {
     let pathObject: any = {};
     this.paths.forEach((methods, path) => {
       pathObject[path] = {};
@@ -687,45 +764,54 @@ export class Swagger {
         pathObject[path][method] = object.render();
       });
     });
-    this.object['paths'] = pathObject;
+    this.object["paths"] = pathObject;
 
-    return Object.assign(
-      this.object,
-      {
-        paths: pathObject,
-        components: Object.assign(
-          {},
-          this.components.size > 0 && { schemas: mapToObj(this.components, r => r.render()) },
-          this.securityComponent && { securitySchemes: Object.keys(this.securityComponent).map(key => {
-            const target = this.securityComponent[key];
-            const value = target instanceof SecurityScheme ? target.render() : target;
-            return { [key]: value };
-          }).reduce((prev, current) => Object.assign(prev, current), {}) }
-        ),
-      }
-    );
+    return Object.assign(this.object, {
+      paths: pathObject,
+      components: Object.assign(
+        {},
+        this.components.size > 0 && {
+          schemas: mapToObj(this.components, r => r.render())
+        },
+        this.securityComponent && {
+          securitySchemes: Object.keys(this.securityComponent)
+            .map(key => {
+              const target = this.securityComponent[key];
+              const value =
+                target instanceof SecurityScheme ? target.render() : target;
+              return { [key]: value };
+            })
+            .reduce((prev, current) => Object.assign(prev, current), {})
+        }
+      )
+    });
   }
 
   /**
    * Generates a yaml file
    */
-  generate (options?: { dry: boolean }) {
+  generate(options?: { dry: boolean }) {
     const iohandler =
-      options && options.dry ? (filename: string, content: string) => {
-        console.log(`=== output to '${filename}' ===`);
-        console.log(content);
-      } : (filename: string, content: string) => {
-        fs.writeFileSync(filename, content);
-      };
+      options && options.dry
+        ? (filename: string, content: string) => {
+            console.log(`=== output to '${filename}' ===`);
+            console.log(content);
+          }
+        : (filename: string, content: string) => {
+            fs.writeFileSync(filename, content);
+          };
 
-    iohandler(this.outfile, yaml.safeDump(this.render(), {
-      noRefs: true,
-    }));
+    iohandler(
+      this.outfile,
+      yaml.safeDump(this.render(), {
+        noRefs: true
+      })
+    );
 
     Object.keys(this.plugins).forEach(pluginName => {
       this.plugins[pluginName].run(iohandler, {
         paths: this.paths,
-        components: this.components,
+        components: this.components
       });
     });
   }
@@ -733,26 +819,32 @@ export class Swagger {
   /**
    * Start a mock server.
    * The server will respond with some value in `example` section in your path object.
-   * 
+   *
    * @param options.interactionUrl Default is `/interactions`
    * @param options.port Default is 3000
    */
-  startMockServer (options?: { interactionUrl?: string, port?: number }) {
+  startMockServer(options?: { interactionUrl?: string; port?: number }) {
     if (!options) options = {};
-    if (!options.interactionUrl) options.interactionUrl = '/interactions';
+    if (!options.interactionUrl) options.interactionUrl = "/interactions";
     if (!options.port) options.port = 3000;
 
     const app = express();
 
     this.paths.forEach((m, url) => {
       m.forEach((pathObject, method) => {
-        (app as any)[method](url, (req: express.Request, res: express.Response) => {
-          const statusCode = pathObject.responses.keys().next().value;
-          const responseBody = pathObject.responses.get(statusCode).content.get('application/json').example();
+        (app as any)[method](
+          url,
+          (req: express.Request, res: express.Response) => {
+            const statusCode = pathObject.responses.keys().next().value;
+            const responseBody = pathObject.responses
+              .get(statusCode)
+              .content.get("application/json")
+              .example();
 
-          res.status(parseInt(statusCode, 10)).json(responseBody);
-        })
-      })
+            res.status(parseInt(statusCode, 10)).json(responseBody);
+          }
+        );
+      });
     });
 
     app.listen(options.port, () => {
@@ -764,7 +856,7 @@ export class Swagger {
    * Evaluates options and arguments
    * @param options Commandline options for cli
    */
-  evaluate (options?: { mockServer: boolean, dryRun: boolean }) {
+  evaluate(options?: { mockServer: boolean; dryRun: boolean }) {
     if (options.mockServer) {
       this.startMockServer();
     } else {
@@ -775,17 +867,15 @@ export class Swagger {
   /**
    * Runs the swagger-devkit cli
    */
-  run (options?: { dry: boolean }) {
-    commandpost
-      .exec(this.command, process.argv)
-      .catch(err => {
-        if (err instanceof Error) {
-          console.error(err.stack);
-        } else {
-          console.error(err);
-        }
+  run(options?: { dry: boolean }) {
+    commandpost.exec(this.command, process.argv).catch(err => {
+      if (err instanceof Error) {
+        console.error(err.stack);
+      } else {
+        console.error(err);
+      }
 
-        process.exit(1);
-      });
+      process.exit(1);
+    });
   }
 }

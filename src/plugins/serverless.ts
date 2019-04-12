@@ -1,16 +1,16 @@
-import * as devkit from '../index';
-import * as yaml from 'js-yaml';
+import * as devkit from "../index";
+import * as yaml from "js-yaml";
 
 export interface ServerlessOptions {
-  filepath: string,
-  aggregateByFunctionName?: boolean,
+  filepath: string;
+  aggregateByFunctionName?: boolean;
 }
 
 export class ServerlessPlugin extends devkit.Plugin {
   options: ServerlessOptions;
   pathOptions: Map<string, object> = new Map();
 
-  constructor (options: ServerlessOptions) {
+  constructor(options: ServerlessOptions) {
     super();
 
     this.options = options;
@@ -20,34 +20,56 @@ export class ServerlessPlugin extends devkit.Plugin {
     return `${path}#${method}`;
   }
 
-  addPathOptions (path: string, method: devkit.HttpMethod, options: object) {
-    this.pathOptions.set(ServerlessPlugin.generatePathKey(path, method), options);
+  addPathOptions(path: string, method: devkit.HttpMethod, options: object) {
+    this.pathOptions.set(
+      ServerlessPlugin.generatePathKey(path, method),
+      options
+    );
   }
 
-  run (iohandler: (filename: string, content: string) => void, swagger: devkit.SwaggerRepr) {
+  run(
+    iohandler: (filename: string, content: string) => void,
+    swagger: devkit.SwaggerRepr
+  ) {
     let object: any = {};
 
     swagger.paths.forEach((pathMap, url) => {
       pathMap.forEach((path, method) => {
-        const pathOptions: any = this.pathOptions.get(ServerlessPlugin.generatePathKey(url,method));
+        const pathOptions: any = this.pathOptions.get(
+          ServerlessPlugin.generatePathKey(url, method)
+        );
 
-        if (this.options.aggregateByFunctionName && (!pathOptions || !pathOptions['functionName'])) {
-          throw new Error(`Specify 'functionName' under aggregateByFunctionName mode for the path: ${method} ${url}`);
+        if (
+          this.options.aggregateByFunctionName &&
+          (!pathOptions || !pathOptions["functionName"])
+        ) {
+          throw new Error(
+            `Specify 'functionName' under aggregateByFunctionName mode for the path: ${method} ${url}`
+          );
         }
 
         const name = this.options.aggregateByFunctionName
-          ? pathOptions['functionName']
-          : `${url.split('{').join('_').split('}').join('_').split('/').join('')}_${method}`;
+          ? pathOptions["functionName"]
+          : `${url
+              .split("{")
+              .join("_")
+              .split("}")
+              .join("_")
+              .split("/")
+              .join("")}_${method}`;
 
         if (!object[name]) {
           object[name] = { events: [] };
         }
 
-        object[name]['events'].push({
-          http: Object.assign({
-            path: url,
-            method: method,
-          }, pathOptions['apigateway'])
+        object[name]["events"].push({
+          http: Object.assign(
+            {
+              path: url,
+              method: method
+            },
+            pathOptions["apigateway"]
+          )
         });
       });
     });
