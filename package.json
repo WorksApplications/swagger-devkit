@@ -35,6 +35,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "lint": "prettier --check '{src,tests}/**/*.{js,ts}'",
     "watch": "tsc -w",
     "generate:doc": "yarn typedoc --out docs"
   },
