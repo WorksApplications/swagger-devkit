@@ -23,6 +23,8 @@
     "prettier": "^1.16.4",
     "pretty-quick": "^1.10.0",
     "ts-jest": "^24.0.2",
+    "tslint": "^5.15.0",
+    "tslint-config-prettier": "^1.18.0",
     "typedoc": "^0.14.0",
     "typescript": "^3.4.3"
   },
