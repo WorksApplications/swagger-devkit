@@ -14,3 +14,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
       - run: yarn test
+      - run: yarn tslint --project .
