@@ -7,7 +7,11 @@
     "es6": true,
     "node": true
   },
-  "rules": {},
+  "rules": {
+    "no-console": [
+      "warn"
+    ]
+  },
   "extends": "eslint:recommended",
   "globals": {
     "Atomics": "readonly",
