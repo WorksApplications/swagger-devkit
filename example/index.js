@@ -66,31 +66,31 @@ api.addPath(
       'pets',
     ],
   })
-  .addParameter({
-    name: 'limit',
-    in: 'query',
-    description: 'How many items to return at one time (max 100)',
-    required: false,
-    schema: swagger.Schema.int32(),
-  })
-  .addResponse(
-    '200',
-    new swagger.Response({
-      description: 'A paged array of pets'
+    .addParameter({
+      name: 'limit',
+      in: 'query',
+      description: 'How many items to return at one time (max 100)',
+      required: false,
+      schema: swagger.Schema.int32(),
     })
-    .addHeader('x-next', {
-      description: 'A link to the next page of responses',
-      schema: swagger.Schema.string(),
-    })
-    .addContent('application/json', petsObject)
-  )
-  .addResponse(
-    'default',
-    new swagger.Response({
-      description: 'unexpected error',
-    })
-    .addContent('application/json', errObject)
-  ),
+    .addResponse(
+      '200',
+      new swagger.Response({
+        description: 'A paged array of pets'
+      })
+        .addHeader('x-next', {
+          description: 'A link to the next page of responses',
+          schema: swagger.Schema.string(),
+        })
+        .addContent('application/json', petsObject)
+    )
+    .addResponse(
+      'default',
+      new swagger.Response({
+        description: 'unexpected error',
+      })
+        .addContent('application/json', errObject)
+    ),
   {
     serverless: {
       functionName: 'pets',
@@ -104,21 +104,21 @@ api.addPath(
   new swagger.Path({
     summary: 'Create a pet',
     operationId: 'createPets',
-    tags: [ 'pets' ],
+    tags: ['pets'],
   })
-  .addResponse(
-    '201',
-    new swagger.Response({
-      description: 'Null response'
-    })
-  )
-  .addResponse(
-    'default',
-    new swagger.Response({
-      description: 'unexpected error',
-    })
-    .addContent('application/json', errObject)
-  ),
+    .addResponse(
+      '201',
+      new swagger.Response({
+        description: 'Null response'
+      })
+    )
+    .addResponse(
+      'default',
+      new swagger.Response({
+        description: 'unexpected error',
+      })
+        .addContent('application/json', errObject)
+    ),
   {
     serverless: {
       functionName: 'pets',
@@ -135,31 +135,31 @@ api.addPath(
   new swagger.Path({
     summary: 'Info for a specific pet',
     operationId: 'showPetById',
-    tags: [ 'pets' ],
+    tags: ['pets'],
   })
-  .addParameter({
-    name: 'petId',
-    in: 'path',
-    required: true,
-    description: 'The id of the pet to retrieve',
-    schema: {
-      type: 'string',
-    }
-  })
-  .addResponse(
-    '200',
-    new swagger.Response({
-      description: 'Expected response to a valid request',
+    .addParameter({
+      name: 'petId',
+      in: 'path',
+      required: true,
+      description: 'The id of the pet to retrieve',
+      schema: {
+        type: 'string',
+      }
     })
-    .addContent('application/json', petsObject)
-  )
-  .addResponse(
-    'default',
-    new swagger.Response({
-      description: 'unexpected error',
-    })
-    .addContent('application/json', errObject)
-  ),
+    .addResponse(
+      '200',
+      new swagger.Response({
+        description: 'Expected response to a valid request',
+      })
+        .addContent('application/json', petsObject)
+    )
+    .addResponse(
+      'default',
+      new swagger.Response({
+        description: 'unexpected error',
+      })
+        .addContent('application/json', errObject)
+    ),
   {
     serverless: {
       functionName: 'pets',
@@ -170,6 +170,4 @@ api.addPath(
   }
 );
 
-api.run({
-  dry: true
-});
+api.run();

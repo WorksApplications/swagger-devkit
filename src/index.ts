@@ -441,7 +441,7 @@ export class Ref {
   }
 
   example(): any {
-    throw new Error("not implemented yet");
+    throw new Error('not implemented yet');
   }
 }
 
@@ -528,28 +528,28 @@ export interface OAuthFlowsObject {
 }
 
 export interface OAuthFlowObject {
-  authorizationUrl: string;
-  tokenUrl: string;
-  refreshUrl?: string;
-  scopes: object;
+  authorizationUrl: string,
+  tokenUrl: string,
+  refreshUrl?: string,
+  scopes: object,
 }
 
 export type SecuritySchemeProps = {
   type: "apiKey" | "http" | "oauth2" | "openIdConnect";
   description?: string;
 } & (
-  | {
+    | {
       name: string;
       in: "query" | "header" | "cookie";
     }
-  | {
+    | {
       scheme: string;
       bearerFormat?: string;
     }
-  | {
+    | {
       flows: OAuthFlowsObject;
     }
-  | {
+    | {
       openIdConnectUrl: string;
     });
 
@@ -560,9 +560,7 @@ export class SecurityScheme {
     this.scheme = props;
   }
 
-  static basic(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
-  ): SecurityScheme {
+  static basic(overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
     return new SecurityScheme({
       type: "http",
       scheme: "basic",
@@ -570,11 +568,7 @@ export class SecurityScheme {
     });
   }
 
-  static apiKey(
-    in_: "query" | "header" | "cookie",
-    name: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "in" | "name">
-  ): SecurityScheme {
+  static apiKey(in_: 'query' | 'header' | 'cookie', name: string, overrideProps?: Omit<SecurityScheme, 'type' | 'in' | 'name'>): SecurityScheme {
     return new SecurityScheme({
       type: "apiKey",
       in: in_,
@@ -583,9 +577,7 @@ export class SecurityScheme {
     });
   }
 
-  static bearer(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
-  ): SecurityScheme {
+  static bearer(overrideProps?: Omit<SecurityScheme, 'type' | 'scheme'>): SecurityScheme {
     return new SecurityScheme({
       type: "http",
       scheme: "bearer",
@@ -593,10 +585,7 @@ export class SecurityScheme {
     });
   }
 
-  static openId(
-    openIdConnectUrl: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "openIdConnectUrl">
-  ): SecurityScheme {
+  static openId(openIdConnectUrl: string, overrideProps?: Omit<SecurityScheme, 'type' | 'openIdConnectUrl'>): SecurityScheme {
     return new SecurityScheme({
       type: "openIdConnect",
       openIdConnectUrl,
@@ -604,10 +593,7 @@ export class SecurityScheme {
     });
   }
 
-  static oauth2(
-    flows: OAuthFlowsObject,
-    overrideProps?: Omit<SecurityScheme, "flows">
-  ): SecurityScheme {
+  static oauth2(flows: OAuthFlowsObject, overrideProps?: Omit<SecurityScheme, 'flows'>): SecurityScheme {
     return new SecurityScheme({
       type: "oauth2",
       flows,
@@ -626,11 +612,8 @@ export interface SwaggerRepr {
 }
 
 export class Plugin {
-  addPathOptions(path: string, method: HttpMethod, options: object) {}
-  run(
-    iohandler: (filename: string, content: string) => void,
-    swagger: SwaggerRepr
-  ) {}
+  addPathOptions(_path: string, _method: HttpMethod, _options: object) { }
+  run(_iohandler: (filename: string, content: string) => void, _swagger: SwaggerRepr) { }
 }
 
 /**
@@ -657,14 +640,11 @@ export class Swagger {
   private securityComponent: { [name: string]: SecurityScheme | object };
 
   private command = commandpost
-    .create<{ mockServer: boolean; dryRun: boolean }, {}>("swagger-devkit")
-    .version(require("../package.json").version, "-v, --version")
-    .option("-s, --mock-server", "Start the mock server")
-    .option(
-      "--dry-run",
-      "Dry-run; not actually run the command but show the result"
-    )
-    .action((opts, args) => {
+    .create<{ mockServer: boolean, dryRun: boolean }, {}>("swagger-devkit")
+    .version(require('../package.json').version, '-v, --version')
+    .option('-s, --mock-server', 'Start the mock server')
+    .option('--dry-run', 'Dry-run; not actually run the command but show the result')
+    .action((opts, _args) => {
       this.evaluate(opts);
     });
 
@@ -764,27 +744,25 @@ export class Swagger {
         pathObject[path][method] = object.render();
       });
     });
-    this.object["paths"] = pathObject;
+    this.object['paths'] = pathObject;
 
-    return Object.assign(this.object, {
-      paths: pathObject,
-      components: Object.assign(
-        {},
-        this.components.size > 0 && {
-          schemas: mapToObj(this.components, r => r.render())
-        },
-        this.securityComponent && {
-          securitySchemes: Object.keys(this.securityComponent)
-            .map(key => {
+    return Object.assign(
+      this.object,
+      {
+        paths: pathObject,
+        components: Object.assign(
+          {},
+          this.components.size > 0 && { schemas: mapToObj(this.components, r => r.render()) },
+          this.securityComponent && {
+            securitySchemes: Object.keys(this.securityComponent).map(key => {
               const target = this.securityComponent[key];
-              const value =
-                target instanceof SecurityScheme ? target.render() : target;
+              const value = target instanceof SecurityScheme ? target.render() : target;
               return { [key]: value };
-            })
-            .reduce((prev, current) => Object.assign(prev, current), {})
-        }
-      )
-    });
+            }).reduce((prev, current) => Object.assign(prev, current), {})
+          }
+        ),
+      }
+    );
   }
 
   /**
@@ -794,12 +772,12 @@ export class Swagger {
     const iohandler =
       options && options.dry
         ? (filename: string, content: string) => {
-            console.log(`=== output to '${filename}' ===`);
-            console.log(content);
-          }
+          console.log(`=== output to '${filename}' ===`);
+          console.log(content);
+        }
         : (filename: string, content: string) => {
-            fs.writeFileSync(filename, content);
-          };
+          fs.writeFileSync(filename, content);
+        };
 
     iohandler(
       this.outfile,
@@ -823,7 +801,7 @@ export class Swagger {
    * @param options.interactionUrl Default is `/interactions`
    * @param options.port Default is 3000
    */
-  startMockServer(options?: { interactionUrl?: string; port?: number }) {
+  startMockServer(options?: { interactionUrl?: string, port?: number }) {
     if (!options) options = {};
     if (!options.interactionUrl) options.interactionUrl = "/interactions";
     if (!options.port) options.port = 3000;
@@ -856,7 +834,7 @@ export class Swagger {
    * Evaluates options and arguments
    * @param options Commandline options for cli
    */
-  evaluate(options?: { mockServer: boolean; dryRun: boolean }) {
+  evaluate(options?: { mockServer: boolean, dryRun: boolean }) {
     if (options.mockServer) {
       this.startMockServer();
     } else {
@@ -867,15 +845,17 @@ export class Swagger {
   /**
    * Runs the swagger-devkit cli
    */
-  run(options?: { dry: boolean }) {
-    commandpost.exec(this.command, process.argv).catch(err => {
-      if (err instanceof Error) {
-        console.error(err.stack);
-      } else {
-        console.error(err);
-      }
+  run() {
+    commandpost
+      .exec(this.command, process.argv)
+      .catch(err => {
+        if (err instanceof Error) {
+          console.error(err.stack);
+        } else {
+          console.error(err);
+        }
 
-      process.exit(1);
-    });
+        process.exit(1);
+      });
   }
 }
