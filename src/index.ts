@@ -626,10 +626,10 @@ export interface SwaggerRepr {
 }
 
 export class Plugin {
-  addPathOptions(path: string, method: HttpMethod, options: object) {}
+  addPathOptions(_path: string, _method: HttpMethod, _options: object) {}
   run(
-    iohandler: (filename: string, content: string) => void,
-    swagger: SwaggerRepr
+    _iohandler: (_filename: string, _content: string) => void,
+    _swagger: SwaggerRepr
   ) {}
 }
 
@@ -664,7 +664,7 @@ export class Swagger {
       "--dry-run",
       "Dry-run; not actually run the command but show the result"
     )
-    .action((opts, args) => {
+    .action((opts, _args) => {
       this.evaluate(opts);
     });
 
@@ -867,7 +867,7 @@ export class Swagger {
   /**
    * Runs the swagger-devkit cli
    */
-  run(options?: { dry: boolean }) {
+  run() {
     commandpost.exec(this.command, process.argv).catch(err => {
       if (err instanceof Error) {
         console.error(err.stack);
