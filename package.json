@@ -18,6 +18,10 @@
     "@types/jest": "^24.0.11",
     "@types/js-yaml": "^3.12.1",
     "@types/node": "^12.0.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "@typescript-eslint/typescript-estree": "^1.9.0",
+    "eslint": "^5.16.0",
     "husky": "^2.0.0",
     "jest": "^24.7.1",
     "prettier": "^1.16.4",
@@ -37,7 +41,8 @@
     "test": "jest",
     "lint": "prettier --check '{src,tests}/**/*.{js,ts}'",
     "watch": "tsc -w",
-    "generate:doc": "yarn typedoc --out docs"
+    "generate:doc": "yarn typedoc --out docs",
+    "eslint": "eslint -c ./.eslintrc.json 'src/**/*.{ts,tsx}'"
   },
   "types": "./dist/index.d.ts",
   "husky": {
