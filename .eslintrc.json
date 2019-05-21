@@ -12,7 +12,7 @@
       "warn"
     ],
     "no-unused-vars": [
-      "error",
+      "warn",
       {
         "argsIgnorePattern": "^_"
       }
