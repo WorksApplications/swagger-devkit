@@ -561,7 +561,7 @@ export class SecurityScheme {
   }
 
   static basic(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+    overrideProps?: Omit<SecuritySchemeProps, "type" | "scheme">
   ): SecurityScheme {
     return new SecurityScheme({
       type: "http",
@@ -573,7 +573,7 @@ export class SecurityScheme {
   static apiKey(
     in_: "query" | "header" | "cookie",
     name: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "in" | "name">
+    overrideProps?: Omit<SecuritySchemeProps, "type" | "in" | "name">
   ): SecurityScheme {
     return new SecurityScheme({
       type: "apiKey",
@@ -584,7 +584,7 @@ export class SecurityScheme {
   }
 
   static bearer(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+    overrideProps?: Omit<SecuritySchemeProps, "type" | "scheme">
   ): SecurityScheme {
     return new SecurityScheme({
       type: "http",
@@ -595,7 +595,7 @@ export class SecurityScheme {
 
   static openId(
     openIdConnectUrl: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "openIdConnectUrl">
+    overrideProps?: Omit<SecuritySchemeProps, "type" | "openIdConnectUrl">
   ): SecurityScheme {
     return new SecurityScheme({
       type: "openIdConnect",
@@ -606,7 +606,7 @@ export class SecurityScheme {
 
   static oauth2(
     flows: OAuthFlowsObject,
-    overrideProps?: Omit<SecurityScheme, "flows">
+    overrideProps?: Omit<SecuritySchemeProps, "flows">
   ): SecurityScheme {
     return new SecurityScheme({
       type: "oauth2",
