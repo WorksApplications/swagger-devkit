@@ -40,7 +40,6 @@
     "build": "tsc",
     "test": "jest",
     "lint": "prettier --check '{src,tests}/**/*.{js,ts}'",
-    "lint:format": "prettier --write '{src,tests}/**/*.{js,ts}'",
     "watch": "tsc -w",
     "generate:doc": "yarn typedoc --out docs",
     "eslint": "eslint -c ./.eslintrc.json 'src/**/*.{ts,tsx}'"
@@ -48,7 +47,7 @@
   "types": "./dist/index.d.ts",
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && yarn lint:format"
+      "pre-commit": "pretty-quick --staged"
     }
   }
 }

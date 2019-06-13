@@ -55,7 +55,11 @@ module.exports = {
   // globalTeardown: null,
 
   // A set of global variables that need to be available in all test environments
-  // globals: {},
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
+  },
 
   // An array of directory names to be searched recursively up from the requiring module's location
   // moduleDirectories: [
@@ -63,10 +67,7 @@ module.exports = {
   // ],
 
   // An array of file extensions your modules use
-  moduleFileExtensions: [
-    "js",
-    "ts",
-  ],
+  moduleFileExtensions: ['js', 'ts'],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
@@ -122,7 +123,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "node",
+  testEnvironment: 'node',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -132,8 +133,8 @@ module.exports = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-  //   "**/__tests__/**/*.js?(x)",
-    "**/?(*.)+(spec|test).(js|ts)?(x)"
+    //   "**/__tests__/**/*.js?(x)",
+    '**/?(*.)+(spec|test).(js|ts)?(x)'
   ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
@@ -158,8 +159,8 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    "^.+\\.tsx?$": "ts-jest"
-  },
+    '^.+\\.tsx?$': 'ts-jest'
+  }
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [

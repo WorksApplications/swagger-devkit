@@ -1,9 +1,32 @@
-import * as devkit from "../src/index";
-import * as yaml from "js-yaml";
+import * as devkit from '../src/index';
+import * as yaml from 'js-yaml';
 
-describe("Swagger", () => {
-  describe("Info Object", () => {
-    it("should add info", () => {
+describe('Schema', () => {
+  it('should be nullable', () => {
+    const swagger = new devkit.Swagger();
+
+    const expected = yaml.safeLoad(`
+    openapi: 3.0.0
+    components:
+      schemas:
+        Foo:
+          type: string
+          nullable: true
+    `);
+
+    new devkit.Component(swagger, 'Foo', {
+      type: 'string',
+      nullable: true
+    });
+    const actual: any = swagger.render();
+
+    expect(actual).toEqual(expect.objectContaining(expected));
+  });
+});
+
+describe('Swagger', () => {
+  describe('Info Object', () => {
+    it('should add info', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -22,19 +45,19 @@ describe("Swagger", () => {
       `);
 
       swagger.addInfo({
-        title: "Sample Pet Store App",
-        description: "This is a sample server for a pet store.",
-        termsOfService: "http://example.com/terms/",
+        title: 'Sample Pet Store App',
+        description: 'This is a sample server for a pet store.',
+        termsOfService: 'http://example.com/terms/',
         contact: {
-          name: "API Support",
-          url: "http://www.example.com/support",
-          email: "support@example.com"
+          name: 'API Support',
+          url: 'http://www.example.com/support',
+          email: 'support@example.com'
         },
         license: {
-          name: "Apache 2.0",
-          url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+          name: 'Apache 2.0',
+          url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
         },
-        version: "1.0.1"
+        version: '1.0.1'
       });
 
       const actual: any = swagger.render();
@@ -43,8 +66,8 @@ describe("Swagger", () => {
     });
   });
 
-  describe("Servers Object", () => {
-    it("should add servers object", () => {
+  describe('Servers Object', () => {
+    it('should add servers object', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -59,16 +82,16 @@ describe("Swagger", () => {
 
       swagger.addServers([
         {
-          url: "https://development.gigantic-server.com/v1",
-          description: "Development server"
+          url: 'https://development.gigantic-server.com/v1',
+          description: 'Development server'
         },
         {
-          url: "https://staging.gigantic-server.com/v1",
-          description: "Staging server"
+          url: 'https://staging.gigantic-server.com/v1',
+          description: 'Staging server'
         },
         {
-          url: "https://api.gigantic-server.com/v1",
-          description: "Production server"
+          url: 'https://api.gigantic-server.com/v1',
+          description: 'Production server'
         }
       ]);
 
@@ -77,7 +100,7 @@ describe("Swagger", () => {
       expect(actual).toEqual(expect.objectContaining(expected));
     });
 
-    it("should add servers object with variables", () => {
+    it('should add servers object with variables', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -101,20 +124,20 @@ describe("Swagger", () => {
 
       swagger.addServers([
         {
-          url: "https://{username}.gigantic-server.com:{port}/{basePath}",
-          description: "The production API server",
+          url: 'https://{username}.gigantic-server.com:{port}/{basePath}',
+          description: 'The production API server',
           variables: {
             username: {
-              default: "demo",
+              default: 'demo',
               description:
-                "this value is assigned by the service provider, in this example `gigantic-server.com`"
+                'this value is assigned by the service provider, in this example `gigantic-server.com`'
             },
             port: {
-              enum: ["8443", "443"],
-              default: "8443"
+              enum: ['8443', '443'],
+              default: '8443'
             },
             basePath: {
-              default: "v2"
+              default: 'v2'
             }
           }
         }
@@ -126,8 +149,8 @@ describe("Swagger", () => {
     });
   });
 
-  describe("Components Object", () => {
-    it("should define schemas", () => {
+  describe('Components Object', () => {
+    it('should define schemas', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -161,7 +184,7 @@ describe("Swagger", () => {
 
       new devkit.Component(
         swagger,
-        "GeneralError",
+        'GeneralError',
         devkit.Schema.object({
           code: devkit.Schema.int32(),
           message: devkit.Schema.string()
@@ -169,7 +192,7 @@ describe("Swagger", () => {
       );
       new devkit.Component(
         swagger,
-        "Category",
+        'Category',
         devkit.Schema.object({
           id: devkit.Schema.int64(),
           name: devkit.Schema.string()
@@ -177,7 +200,7 @@ describe("Swagger", () => {
       );
       new devkit.Component(
         swagger,
-        "Tag",
+        'Tag',
         devkit.Schema.object({
           id: devkit.Schema.int64(),
           name: devkit.Schema.string()
@@ -189,12 +212,12 @@ describe("Swagger", () => {
       expect(actual).toEqual(expect.objectContaining(expected));
     });
 
-    it("key is already defined", () => {
+    it('key is already defined', () => {
       const swagger = new devkit.Swagger();
 
       new devkit.Component(
         swagger,
-        "GeneralError",
+        'GeneralError',
         devkit.Schema.object({
           code: devkit.Schema.int32(),
           message: devkit.Schema.string()
@@ -204,18 +227,18 @@ describe("Swagger", () => {
       expect(() => {
         new devkit.Component(
           swagger,
-          "GeneralError",
+          'GeneralError',
           devkit.Schema.object({
             id: devkit.Schema.int64(),
             name: devkit.Schema.string()
           })
         );
-      }).toThrow("DuplicateComponentKeyException");
+      }).toThrow('DuplicateComponentKeyException');
     });
   });
 
-  describe("Paths Object", () => {
-    it("should add paths object", () => {
+  describe('Paths Object', () => {
+    it('should add paths object', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -235,18 +258,18 @@ describe("Swagger", () => {
       `);
 
       swagger.addPath(
-        "/pets",
+        '/pets',
         devkit.HttpMethod.GET,
         new devkit.Path({
           description:
-            "Returns all pets from the system that the user has access to"
+            'Returns all pets from the system that the user has access to'
         }).addResponse(
-          "200",
+          '200',
           new devkit.Response({
-            description: "A list of pets."
+            description: 'A list of pets.'
           }).addContent(
-            "application/json",
-            devkit.Schema.array(new devkit.Ref("#/components/schemas/pet"))
+            'application/json',
+            devkit.Schema.array(new devkit.Ref('#/components/schemas/pet'))
           )
         )
       );
@@ -256,7 +279,7 @@ describe("Swagger", () => {
       expect(actual).toEqual(expect.objectContaining(expected));
     });
 
-    it("should add paths object with parameter", () => {
+    it('should add paths object with parameter', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -294,38 +317,38 @@ describe("Swagger", () => {
       `);
 
       swagger.addPath(
-        "/pets",
+        '/pets',
         devkit.HttpMethod.GET,
         new devkit.Path({
-          description: "Returns pets based on ID",
-          summary: "Find pets by ID",
-          operationId: "getPetsById"
+          description: 'Returns pets based on ID',
+          summary: 'Find pets by ID',
+          operationId: 'getPetsById'
         })
           .addParameter({
-            name: "id",
-            in: "path",
-            description: "ID of pet to use",
+            name: 'id',
+            in: 'path',
+            description: 'ID of pet to use',
             required: true,
             schema: devkit.Schema.array(devkit.Schema.string(), {
-              style: "simple"
+              style: 'simple'
             })
           })
           .addResponse(
-            "200",
+            '200',
             new devkit.Response({
-              description: "pet response"
+              description: 'pet response'
             }).addContent(
-              "*/*",
-              devkit.Schema.array(new devkit.Ref("#/components/schemas/Pet"))
+              '*/*',
+              devkit.Schema.array(new devkit.Ref('#/components/schemas/Pet'))
             )
           )
           .addResponse(
-            "default",
+            'default',
             new devkit.Response({
-              description: "error payload"
+              description: 'error payload'
             }).addContent(
-              "text/html",
-              new devkit.Ref("#/components/schemas/ErrorModel")
+              'text/html',
+              new devkit.Ref('#/components/schemas/ErrorModel')
             )
           )
       );
@@ -353,8 +376,8 @@ describe("Swagger", () => {
     */
   });
 
-  describe("Operation Object", () => {
-    it("should add paths object with requestBody and responses", () => {
+  describe('Operation Object', () => {
+    it('should add paths object with requestBody and responses', () => {
       const swagger = new devkit.Swagger();
 
       const expected = yaml.safeLoad(`
@@ -402,56 +425,56 @@ describe("Swagger", () => {
                 - read:pets`);
 
       swagger.addPath(
-        "/pets/{petId}",
+        '/pets/{petId}',
         devkit.HttpMethod.PUT,
         new devkit.Path({
-          tags: ["pet"],
-          summary: "Updates a pet in the store with form data",
-          operationId: "updatePetWithForm",
+          tags: ['pet'],
+          summary: 'Updates a pet in the store with form data',
+          operationId: 'updatePetWithForm',
           security: [
             {
-              petstore_auth: ["write:pets", "read:pets"]
+              petstore_auth: ['write:pets', 'read:pets']
             }
           ]
         })
           .addParameter({
-            name: "petId",
-            in: "path",
-            description: "ID of pet that needs to be updated",
+            name: 'petId',
+            in: 'path',
+            description: 'ID of pet that needs to be updated',
             required: true,
             schema: devkit.Schema.string()
           })
           .addRequestBody(
             new devkit.RequestBody().addContent(
-              "application/x-www-form-urlencoded",
+              'application/x-www-form-urlencoded',
               {
                 properties: {
                   name: devkit.Schema.string({
-                    description: "Updated name of the pet"
+                    description: 'Updated name of the pet'
                   }),
                   status: devkit.Schema.string({
-                    description: "Updated status of the pet"
+                    description: 'Updated status of the pet'
                   })
                 },
-                required: ["status"]
+                required: ['status']
               }
             )
           )
           .addResponse(
-            "200",
+            '200',
             new devkit.Response({
-              description: "Pet updated."
+              description: 'Pet updated.'
             })
-              .addContent("application/json", {})
-              .addContent("application/xml", {})
+              .addContent('application/json', {})
+              .addContent('application/xml', {})
           )
           .addResponse(
-            "405",
+            '405',
             new devkit.Response({
-              description: "Method Not Allowed"
+              description: 'Method Not Allowed'
             })
-              .addContent("application/json", {})
-              .addContent("application/xml", {})
+              .addContent('application/json', {})
+              .addContent('application/xml', {})
           )
       );
 
