@@ -1,7 +1,7 @@
-import * as fs from "fs";
-import * as yaml from "js-yaml";
-import * as commandpost from "commandpost";
-import * as express from "express";
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
+import * as commandpost from 'commandpost';
+import * as express from 'express';
 
 /**
  * @private
@@ -21,24 +21,24 @@ function mapToObj<T>(
 export type SchemaInput = SchemaProps | Ref;
 
 export enum SchemaType {
-  INTEGER = <any>"integer",
-  NUMBER = <any>"number",
-  STRING = <any>"string",
-  BOOLEAN = <any>"boolean",
-  OBJECT = <any>"object",
-  ARRAY = <any>"array"
+  INTEGER = <any>'integer',
+  NUMBER = <any>'number',
+  STRING = <any>'string',
+  BOOLEAN = <any>'boolean',
+  OBJECT = <any>'object',
+  ARRAY = <any>'array'
 }
 
 export enum SchemaFormat {
-  INT32 = <any>"int32",
-  INT64 = <any>"int64",
-  FLOAT = <any>"float",
-  DOUBLE = <any>"double",
-  BYTE = <any>"byte",
-  BINARY = <any>"binary",
-  DATE = <any>"date",
-  DATETIME = <any>"datetime",
-  PASSWORD = <any>"password"
+  INT32 = <any>'int32',
+  INT64 = <any>'int64',
+  FLOAT = <any>'float',
+  DOUBLE = <any>'double',
+  BYTE = <any>'byte',
+  BINARY = <any>'binary',
+  DATE = <any>'date',
+  DATETIME = <any>'datetime',
+  PASSWORD = <any>'password'
 }
 
 // The recursive element SchemaInput should be abstracted as type parameter
@@ -62,6 +62,7 @@ export interface SchemaProps {
   not?: SchemaInput;
   additionalProperties?: boolean;
   default?: any;
+  nullable?: boolean;
 }
 
 /**
@@ -196,7 +197,7 @@ export class Schema {
       } else if (props.type === SchemaType.INTEGER) {
         return 0;
       } else if (props.type === SchemaType.STRING) {
-        return "";
+        return '';
       } else if (props.type === SchemaType.ARRAY) {
         return [new Schema(props.items).example()];
       } else {
@@ -250,10 +251,7 @@ export interface ResponseProps {
 }
 
 /** @private */
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-
-/** @private */
-type HeaderProps = Omit<ParameterProps, "name" | "in">;
+type HeaderProps = Omit<ParameterProps, 'name' | 'in'>;
 
 export interface EncodingProps {
   contentType?: string;
@@ -307,20 +305,20 @@ export class Response {
 }
 
 export enum ParameterLocation {
-  PATH = <any>"path",
-  HEADER = <any>"header",
-  QUERY = <any>"query",
-  COOKIE = <any>"cookie"
+  PATH = <any>'path',
+  HEADER = <any>'header',
+  QUERY = <any>'query',
+  COOKIE = <any>'cookie'
 }
 
 export enum ParameterStyle {
-  MATRIX = <any>"matrix",
-  LABEL = <any>"label",
-  FORM = <any>"form",
-  SIMPLE = <any>"simple",
-  SPACEDELIMITED = <any>"spaceDelimited",
-  PIPEDELIMITED = <any>"pipeDelimited",
-  deepObject = <any>"deepObject"
+  MATRIX = <any>'matrix',
+  LABEL = <any>'label',
+  FORM = <any>'form',
+  SIMPLE = <any>'simple',
+  SPACEDELIMITED = <any>'spaceDelimited',
+  PIPEDELIMITED = <any>'pipeDelimited',
+  deepObject = <any>'deepObject'
 }
 
 export interface ParameterProps {
@@ -412,7 +410,7 @@ export class Path<method = any> {
     }, this);
   }
 
-  addRequestBody(requestBody: RequestBody): Path<"request_body"> {
+  addRequestBody(requestBody: RequestBody): Path<'request_body'> {
     this.requestBody = requestBody;
     return this;
   }
@@ -441,7 +439,7 @@ export class Ref {
   }
 
   example(): any {
-    throw new Error("not implemented yet");
+    throw new Error('not implemented yet');
   }
 }
 
@@ -503,26 +501,26 @@ export interface ServerProps {
 
 const literal = <V extends keyof any>(v: V) => v;
 export const HttpMethod = {
-  GET: literal("get"),
-  PUT: literal("put"),
-  POST: literal("post"),
-  DELETE: literal("delete"),
-  OPTIONS: literal("options"),
-  HEAD: literal("head"),
-  PATCH: literal("patch"),
-  TRACE: literal("trace")
+  GET: literal('get'),
+  PUT: literal('put'),
+  POST: literal('post'),
+  DELETE: literal('delete'),
+  OPTIONS: literal('options'),
+  HEAD: literal('head'),
+  PATCH: literal('patch'),
+  TRACE: literal('trace')
 };
 export type HttpMethod = (typeof HttpMethod)[keyof typeof HttpMethod];
 
 export interface OAuthFlowsObject {
   implicit?: Pick<
     OAuthFlowObject,
-    "authorizationUrl" | "refreshUrl" | "scopes"
+    'authorizationUrl' | 'refreshUrl' | 'scopes'
   >;
-  password?: Pick<OAuthFlowObject, "tokenUrl" | "refreshUrl" | "scopes">;
+  password?: Pick<OAuthFlowObject, 'tokenUrl' | 'refreshUrl' | 'scopes'>;
   clientCredentials?: Pick<
     OAuthFlowObject,
-    "tokenUrl" | "refreshUrl" | "scopes"
+    'tokenUrl' | 'refreshUrl' | 'scopes'
   >;
   authorizationCode?: OAuthFlowObject;
 }
@@ -535,12 +533,12 @@ export interface OAuthFlowObject {
 }
 
 export type SecuritySchemeProps = {
-  type: "apiKey" | "http" | "oauth2" | "openIdConnect";
+  type: 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
   description?: string;
 } & (
   | {
       name: string;
-      in: "query" | "header" | "cookie";
+      in: 'query' | 'header' | 'cookie';
     }
   | {
       scheme: string;
@@ -561,22 +559,22 @@ export class SecurityScheme {
   }
 
   static basic(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+    overrideProps?: Omit<SecuritySchemeProps, 'type' | 'scheme'>
   ): SecurityScheme {
     return new SecurityScheme({
-      type: "http",
-      scheme: "basic",
+      type: 'http',
+      scheme: 'basic',
       ...overrideProps
     });
   }
 
   static apiKey(
-    in_: "query" | "header" | "cookie",
+    in_: 'query' | 'header' | 'cookie',
     name: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "in" | "name">
+    overrideProps?: Omit<SecuritySchemeProps, 'type' | 'in' | 'name'>
   ): SecurityScheme {
     return new SecurityScheme({
-      type: "apiKey",
+      type: 'apiKey',
       in: in_,
       name: name,
       ...overrideProps
@@ -584,21 +582,21 @@ export class SecurityScheme {
   }
 
   static bearer(
-    overrideProps?: Omit<SecurityScheme, "type" | "scheme">
+    overrideProps?: Omit<SecuritySchemeProps, 'type' | 'scheme'>
   ): SecurityScheme {
     return new SecurityScheme({
-      type: "http",
-      scheme: "bearer",
+      type: 'http',
+      scheme: 'bearer',
       ...overrideProps
     });
   }
 
   static openId(
     openIdConnectUrl: string,
-    overrideProps?: Omit<SecurityScheme, "type" | "openIdConnectUrl">
+    overrideProps?: Omit<SecuritySchemeProps, 'type' | 'openIdConnectUrl'>
   ): SecurityScheme {
     return new SecurityScheme({
-      type: "openIdConnect",
+      type: 'openIdConnect',
       openIdConnectUrl,
       ...overrideProps
     });
@@ -606,10 +604,10 @@ export class SecurityScheme {
 
   static oauth2(
     flows: OAuthFlowsObject,
-    overrideProps?: Omit<SecurityScheme, "flows">
+    overrideProps?: Omit<SecuritySchemeProps, 'flows'>
   ): SecurityScheme {
     return new SecurityScheme({
-      type: "oauth2",
+      type: 'oauth2',
       flows,
       ...overrideProps
     });
@@ -649,7 +647,7 @@ export interface SwaggerOptions {
  * @class The core class of swagger-devkit. See `SwaggerOptions` for constructor options.
  */
 export class Swagger {
-  private outfile: string = "openapi.yml";
+  private outfile: string = 'openapi.yml';
   private object: any = {};
   private paths: Map<string, Map<HttpMethod, Path<any>>> = new Map();
   private components: Map<string, Component> = new Map();
@@ -657,12 +655,12 @@ export class Swagger {
   private securityComponent: { [name: string]: SecurityScheme | object };
 
   private command = commandpost
-    .create<{ mockServer: boolean; dryRun: boolean }, {}>("swagger-devkit")
-    .version(require("../package.json").version, "-v, --version")
-    .option("-s, --mock-server", "Start the mock server")
+    .create<{ mockServer: boolean; dryRun: boolean }, {}>('swagger-devkit')
+    .version(require('../package.json').version, '-v, --version')
+    .option('-s, --mock-server', 'Start the mock server')
     .option(
-      "--dry-run",
-      "Dry-run; not actually run the command but show the result"
+      '--dry-run',
+      'Dry-run; not actually run the command but show the result'
     )
     .action((opts, _args) => {
       this.evaluate(opts);
@@ -670,12 +668,12 @@ export class Swagger {
 
   constructor(options?: SwaggerOptions) {
     if (options && options.openapi) {
-      this.addObject("openapi", options.openapi);
+      this.addObject('openapi', options.openapi);
     } else {
-      this.addObject("openapi", "3.0.0");
+      this.addObject('openapi', '3.0.0');
     }
 
-    this.addObject("paths", {});
+    this.addObject('paths', {});
 
     if (options && options.plugins) {
       this.plugins = options.plugins;
@@ -714,14 +712,14 @@ export class Swagger {
    * Adds `info` section
    */
   addInfo(props: InfoProps) {
-    this.addObject("info", props);
+    this.addObject('info', props);
   }
 
   /**
    * Adds `servers` section
    */
   addServers(props: Array<ServerProps>) {
-    this.addObject("servers", props);
+    this.addObject('servers', props);
   }
 
   /**
@@ -733,8 +731,8 @@ export class Swagger {
    */
   addPath<method>(
     path: string,
-    method: method extends "request_body"
-      ? "put" | "post" | "delete" | "patch"
+    method: method extends 'request_body'
+      ? 'put' | 'post' | 'delete' | 'patch'
       : HttpMethod,
     object: Path<method>,
     pluginOptions?: { [pluginName: string]: object }
@@ -764,7 +762,7 @@ export class Swagger {
         pathObject[path][method] = object.render();
       });
     });
-    this.object["paths"] = pathObject;
+    this.object['paths'] = pathObject;
 
     return Object.assign(this.object, {
       paths: pathObject,
@@ -825,7 +823,7 @@ export class Swagger {
    */
   startMockServer(options?: { interactionUrl?: string; port?: number }) {
     if (!options) options = {};
-    if (!options.interactionUrl) options.interactionUrl = "/interactions";
+    if (!options.interactionUrl) options.interactionUrl = '/interactions';
     if (!options.port) options.port = 3000;
 
     const app = express();
@@ -838,7 +836,7 @@ export class Swagger {
             const statusCode = pathObject.responses.keys().next().value;
             const responseBody = pathObject.responses
               .get(statusCode)
-              .content.get("application/json")
+              .content.get('application/json')
               .example();
 
             res.status(parseInt(statusCode, 10)).json(responseBody);

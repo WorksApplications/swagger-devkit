@@ -1,5 +1,5 @@
-import * as devkit from "../index";
-import * as yaml from "js-yaml";
+import * as devkit from '../index';
+import * as yaml from 'js-yaml';
 
 export interface ServerlessOptions {
   filepath: string;
@@ -41,7 +41,7 @@ export class ServerlessPlugin extends devkit.Plugin {
 
         if (
           this.options.aggregateByFunctionName &&
-          (!pathOptions || !pathOptions["functionName"])
+          (!pathOptions || !pathOptions['functionName'])
         ) {
           throw new Error(
             `Specify 'functionName' under aggregateByFunctionName mode for the path: ${method} ${url}`
@@ -49,26 +49,26 @@ export class ServerlessPlugin extends devkit.Plugin {
         }
 
         const name = this.options.aggregateByFunctionName
-          ? pathOptions["functionName"]
+          ? pathOptions['functionName']
           : `${url
-              .split("{")
-              .join("_")
-              .split("}")
-              .join("_")
-              .split("/")
-              .join("")}_${method}`;
+              .split('{')
+              .join('_')
+              .split('}')
+              .join('_')
+              .split('/')
+              .join('')}_${method}`;
 
         if (!object[name]) {
           object[name] = { events: [] };
         }
 
-        object[name]["events"].push({
+        object[name]['events'].push({
           http: Object.assign(
             {
               path: url,
               method: method
             },
-            pathOptions["apigateway"]
+            pathOptions['apigateway']
           )
         });
       });
