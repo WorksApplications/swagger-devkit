@@ -250,9 +250,6 @@ export interface ResponseProps {
 }
 
 /** @private */
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-
-/** @private */
 type HeaderProps = Omit<ParameterProps, "name" | "in">;
 
 export interface EncodingProps {
