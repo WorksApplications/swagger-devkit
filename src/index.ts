@@ -247,7 +247,7 @@ export class Schema {
 
 // Be careful! This SchemaInput is not converted to Schema in Header object in Response
 export interface ResponseProps {
-  description: string;
+  description?: string;
 }
 
 /** @private */
