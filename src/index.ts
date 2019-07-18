@@ -372,6 +372,7 @@ export interface PathProps {
   description?: string;
   security?: Array<{ [key: string]: Array<string> }>;
   parameters?: Array<ParameterProps>;
+  deprecated?: boolean;
 }
 
 export class Path<method = any> {

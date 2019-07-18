@@ -482,5 +482,28 @@ describe('Swagger', () => {
 
       expect(actual).toEqual(expect.objectContaining(expected));
     });
+
+    it('should support deprecated property', async () => {
+      const swagger = new devkit.Swagger();
+
+      const expected = yaml.safeLoad(`
+      paths:
+        /foo:
+          get:
+            deprecated: true
+      `);
+
+      swagger.addPath(
+        '/foo',
+        devkit.HttpMethod.GET,
+        new devkit.Path({
+          deprecated: true
+        })
+      );
+
+      const actual: any = swagger.render();
+
+      expect(actual).toEqual(expect.objectContaining(expected));
+    });
   });
 });
