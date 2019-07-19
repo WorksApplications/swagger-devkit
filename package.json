@@ -42,7 +42,8 @@
     "lint": "prettier --check '{src,tests}/**/*.{js,ts}'",
     "watch": "tsc -w",
     "generate:doc": "yarn typedoc --out docs",
-    "eslint": "eslint -c ./.eslintrc.json 'src/**/*.{ts,tsx}'"
+    "eslint": "eslint -c ./.eslintrc.json 'src/**/*.{ts,tsx}'",
+    "prepublish": "yarn build"
   },
   "types": "./dist/index.d.ts",
   "husky": {
